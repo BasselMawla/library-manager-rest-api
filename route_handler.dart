@@ -3,6 +3,7 @@
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
+import 'routes/books_controller.dart';
 import 'routes/students_controller.dart';
 
 // Routing setup
@@ -11,6 +12,7 @@ class RouteHandler {
     final router = Router();
 
     router.mount("/students", StudentsController().router);
+    router.mount("/books", BooksController().router);
 
     // All invalid URLs
     router.all("/<ignored|.*>",

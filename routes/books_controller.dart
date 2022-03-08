@@ -1,15 +1,15 @@
-// routes/students_controller.dart
+// routes/books_controller.dart
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
-// Students Collection Routes
-class StudentsController {
+// Books Collection Routes
+class BooksController {
   Router get router {
     final router = Router();
 
     router.get("/", (Request request) {
-      return Response.ok("StudentsController returned");
+      return Response.ok("BoooksController returned");
     });
 
     // POST test route
