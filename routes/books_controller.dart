@@ -2,6 +2,8 @@
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'dart:convert' show jsonDecode, jsonEncode;
+import '../models/books_model.dart' as booksModel;
 
 // Books Collection Routes
 class BooksController {
@@ -12,11 +14,16 @@ class BooksController {
       return Response.ok('BoooksController returned');
     });
 
-    // POST test route
+    // Add a book
+    // TODO: auth and allow adding multiple copies
+    // TODO: Add delete ?and update?
     router.post('/', (Request request) async {
-      final body = await request.readAsString();
-      print(body);
-      return Response.ok(body);
+      final bookJson = await request.readAsString();
+      Map<String, dynamic> bookMap = jsonDecode(bookJson);
+
+      booksModel.addBook(bookMap);
+
+      return Response.ok(jsonEncode(bookMap));
     });
     return router;
   }

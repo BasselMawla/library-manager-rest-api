@@ -5,8 +5,6 @@ Future<MySqlConnection> createConnection() async {
   // Load environment variables from .env file
   load();
 
-  print(env['databaseName'].runtimeType);
-
   final MySqlConnection dbConnection =
       await MySqlConnection.connect(ConnectionSettings(
     host: env['databaseHost'],
@@ -17,8 +15,4 @@ Future<MySqlConnection> createConnection() async {
   ));
 
   return dbConnection;
-}
-
-void closeConnection(MySqlConnection dbConnection) async {
-  await dbConnection.close();
 }
