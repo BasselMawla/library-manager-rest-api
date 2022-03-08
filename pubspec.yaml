@@ -8,3 +8,5 @@ environment:
 dependencies:
   shelf: any
   shelf_router: any
+  mysql1: any
+  dotenv: any

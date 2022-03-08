@@ -1,3 +1,4 @@
 .codio
 .dart_tool
 .packages
+.env*
