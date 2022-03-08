@@ -8,12 +8,12 @@ class BooksController {
   Router get router {
     final router = Router();
 
-    router.get("/", (Request request) {
-      return Response.ok("BoooksController returned");
+    router.get('/', (Request request) {
+      return Response.ok('BoooksController returned');
     });
 
     // POST test route
-    router.post("/", (Request request) async {
+    router.post('/', (Request request) async {
       final body = await request.readAsString();
       print(body);
       return Response.ok(body);

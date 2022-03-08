@@ -11,12 +11,12 @@ class RouteHandler {
   Handler get handler {
     final router = Router();
 
-    router.mount("/students", StudentsController().router);
-    router.mount("/books", BooksController().router);
+    router.mount('/students', StudentsController().router);
+    router.mount('/books', BooksController().router);
 
     // All invalid URLs
-    router.all("/<ignored|.*>",
-        (Request request) => Response.notFound("Page Not Found!"));
+    router.all('/<ignored|.*>',
+        (Request request) => Response.notFound('Page Not Found!'));
 
     return router;
   }
