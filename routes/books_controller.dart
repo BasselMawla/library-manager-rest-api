@@ -2,7 +2,7 @@
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
-import 'dart:convert' show jsonDecode, jsonEncode;
+import 'dart:convert' show jsonDecode, JsonEncoder;
 import '../models/books_model.dart' as booksModel;
 
 // Books Collection Routes
@@ -23,7 +23,10 @@ class BooksController {
 
       booksModel.addBook(bookMap);
 
-      return Response.ok(jsonEncode(bookMap));
+      // Using JsonEncoder to make the JSON human readable
+      JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+
+      return Response.ok(encoder.convert(bookMap));
     });
     return router;
   }
