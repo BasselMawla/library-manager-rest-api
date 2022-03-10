@@ -1,0 +1,12 @@
+# pubspec.yaml
+
+name: library_api
+
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+
+dependencies:
+  shelf: any
+  shelf_router: any
+  mysql1: any
+  dotenv: any

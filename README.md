@@ -1,1 +1,1 @@
-Repository for the Codio API
+Dart API for a library management mobile application
