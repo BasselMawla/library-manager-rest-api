@@ -1,4 +1,4 @@
-// books_model.dart
+// models/books_model.dart
 
 import 'package:mysql1/mysql1.dart';
 import '../database_connection.dart' as database;

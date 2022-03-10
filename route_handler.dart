@@ -13,6 +13,7 @@ class RouteHandler {
 
     router.mount('/students', StudentsController().router);
     router.mount('/books', BooksController().router);
+    //router.mount('/accounts', AccountsController().router);
 
     // All invalid URLs
     router.all('/<ignored|.*>',
