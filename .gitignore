@@ -1,4 +1,5 @@
-.codio
+.vscode
 .dart_tool
 .packages
 .env*
+.todo
