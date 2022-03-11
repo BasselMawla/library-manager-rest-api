@@ -11,9 +11,18 @@ class AccountsController {
 
     router.post('/register', (Request request) async {
       final requestBody = await request.readAsString();
-      Map<String, dynamic> credentials = jsonDecode(requestBody);
+      final Map<String, dynamic> credentials = jsonDecode(requestBody);
 
-      // TODO: Check that credentials are valid input
+      final String username = credentials['username'];
+      final String password = credentials['password'];
+
+      // Check that credentials exist
+      if (username == null ||
+          password == null ||
+          username.isEmpty ||
+          password.isEmpty) {
+        return Response(400, body: "Please enter a username and password");
+      }
 
       //authModel.addUser();
     });
