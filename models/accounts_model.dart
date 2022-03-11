@@ -28,13 +28,18 @@ Future<Response> addUser(Map<String, dynamic> userInfo) async {
           hashedPassword,
           salt,
         ]);
-    return Response.ok('User inserted. Affected rows: ${result.affectedRows}');
+    return Response(201,
+        body: 'User inserted. Affected rows: ${result.affectedRows}');
   } on MySqlException catch (e) {
     print(e);
     // Duplicate entry error
     if (e.errorNumber == 1062) {
       return Response(409, body: "Username already exists!");
     }
+  } catch (e) {
+    print(e);
+    return Response.internalServerError(
+        body: "Something went wrong on our side. Please try again later.");
   } finally {
     print("Closing connection to DB");
     dbConnection.close();
