@@ -11,21 +11,25 @@ class AccountsController {
 
     router.post('/', (Request request) async {
       final requestBody = await request.readAsString();
-      final Map<String, dynamic> userInfo = jsonDecode(requestBody);
+      try {
+        final Map<String, dynamic> userInfo = jsonDecode(requestBody);
+        final String username = userInfo['username'];
+        final String password = userInfo['password'];
+        print(username == null);
 
-      final String username = userInfo['username'];
-      final String password = userInfo['password'];
-
-      // Check that credentials exist
-      // TODO check other info
-      if (username == null ||
-          password == null ||
-          username.isEmpty ||
-          password.isEmpty) {
-        return Response(400, body: "Please enter a username and password");
+        // Check that credentials exist
+        // TODO check other info
+        if (username == null ||
+            password == null ||
+            username.isEmpty ||
+            password.isEmpty) {
+          return Response(400, body: "Please enter a username and password.");
+        }
+        return accountsModel.addUser(userInfo);
+      } on FormatException catch (e) {
+        print(e);
+        return Response(400, body: "Invalid JSON!");
       }
-
-      return accountsModel.addUser(userInfo);
     });
 
     return router;

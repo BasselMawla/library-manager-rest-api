@@ -1,7 +1,10 @@
 // /models/authModel.dart
 
+import 'dart:io';
+
 import 'package:mysql1/mysql1.dart';
 import 'package:shelf/shelf.dart';
+import 'dart:async';
 import '../database_connection.dart' as database;
 import 'utils.dart';
 
@@ -28,18 +31,24 @@ Future<Response> addUser(Map<String, dynamic> userInfo) async {
           hashedPassword,
           salt,
         ]);
-    return Response(201,
-        body: 'User inserted. Affected rows: ${result.affectedRows}');
+
+    print('User inserted. Affected rows: ${result.affectedRows}');
+    return Response(201, body: 'User registered.');
   } on MySqlException catch (e) {
     print(e);
     // Duplicate entry error
     if (e.errorNumber == 1062) {
       return Response(409, body: "Username already exists!");
     }
+    return Response.internalServerError(body: e.message);
   } catch (e) {
     print(e);
+    if (e is TimeoutException || e is SocketException) {
+      return Response.internalServerError(
+          body: 'Connection failed. Please try again later.');
+    }
     return Response.internalServerError(
-        body: "Something went wrong on our side. Please try again later.");
+        body: 'Something went wrong on our side. Please try again later.');
   } finally {
     print("Closing connection to DB");
     dbConnection.close();
