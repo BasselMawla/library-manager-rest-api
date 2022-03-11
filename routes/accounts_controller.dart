@@ -4,6 +4,7 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'dart:convert' show jsonDecode, JsonEncoder;
 import '../models/accounts_model.dart' as accountsModel;
+import '../models/utils.dart';
 
 class AccountsController {
   Router get router {
@@ -12,20 +13,38 @@ class AccountsController {
     router.post('/', (Request request) async {
       final requestBody = await request.readAsString();
       try {
-        final Map<String, dynamic> userInfo = jsonDecode(requestBody);
-        final String username = userInfo['username'];
-        final String password = userInfo['password'];
-        print(username == null);
+        final Map<String, dynamic> accountInfo = jsonDecode(requestBody);
 
-        // Check that credentials exist
-        // TODO check other info
-        if (username == null ||
-            password == null ||
-            username.isEmpty ||
-            password.isEmpty) {
+        // Check that all info exists
+        if (isMissingInput([
+          accountInfo['username'],
+          accountInfo['first_name'],
+          accountInfo['last_name'],
+          accountInfo['password'],
+        ])) {
+          return Response(400, body: "Please enter all user information.");
+        }
+        return accountsModel.addAccount(accountInfo);
+      } on FormatException catch (e) {
+        print(e);
+        return Response(400, body: "Invalid JSON!");
+      }
+    });
+
+    router.get('/', (Request request) async {
+      final requestBody = await request.readAsString();
+      try {
+        final Map<String, dynamic> credentials = jsonDecode(requestBody);
+
+        // Check that all info exists
+        if (isMissingInput([
+          credentials['username'],
+          credentials['password'],
+        ])) {
           return Response(400, body: "Please enter a username and password.");
         }
-        return accountsModel.addUser(userInfo);
+        return accountsModel.loginAccount(
+            credentials['username'], credentials['password']);
       } on FormatException catch (e) {
         print(e);
         return Response(400, body: "Invalid JSON!");

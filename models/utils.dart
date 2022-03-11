@@ -22,3 +22,12 @@ String hashPassword(String password, String salt) {
 
   return saltedHash.toString();
 }
+
+bool isMissingInput(List<String> keys) {
+  for (final key in keys) {
+    if (key == null || key.isEmpty) {
+      return true;
+    }
+  }
+  return false;
+}
