@@ -1,31 +1,47 @@
 // /models/authModel.dart
 
 import 'package:mysql1/mysql1.dart';
+import 'package:shelf/shelf.dart';
 import '../database_connection.dart' as database;
 import 'utils.dart';
 
-addUser(Map<String, dynamic> credentials) async {
-  if (!isValidInput(credentials)) {
+Future<Response> addUser(Map<String, dynamic> userInfo) async {
+  if (!isValidCredentials(userInfo)) {
     // Guard statement, return error/fail
     // TODO
   }
 
   MySqlConnection dbConnection = await database.createConnection();
 
-  // Add the user, if not unique an error is returned which we can catch
-  Results result = await dbConnection.query(
-      'INSERT INTO account (username, first_name, last_name, password, salt) ' +
-          'VALUE (?, ?, ?, ?, now())',
-      [
-        credentials['username'],
-        hashPassword(credentials['password'], generateSalt()),
-      ]);
-  print('Book inserted. Affected rows: ${result.affectedRows}');
+  final String salt = generateSalt();
+  final String hashedPassword = hashPassword(userInfo['password'], salt);
 
-  dbConnection.close();
+  // Add the user, if not unique an error is returned which we can catch
+  try {
+    Results result = await dbConnection.query(
+        'INSERT INTO account (username, first_name, last_name, password, salt) ' +
+            'VALUE (?, ?, ?, ?, ?)',
+        [
+          userInfo['username'],
+          userInfo['first_name'],
+          userInfo['last_name'],
+          hashedPassword,
+          salt,
+        ]);
+    return Response.ok('User inserted. Affected rows: ${result.affectedRows}');
+  } on MySqlException catch (e) {
+    print(e);
+    // Duplicate entry error
+    if (e.errorNumber == 1062) {
+      return Response(409, body: "Username already exists!");
+    }
+  } finally {
+    print("Closing connection to DB");
+    dbConnection.close();
+  }
 }
 
-bool isValidInput(Map<String, dynamic> book) {
+bool isValidCredentials(Map<String, dynamic> userInfo) {
   // TODO
-  return false;
+  return true;
 }

@@ -9,14 +9,15 @@ class AccountsController {
   Router get router {
     final router = Router();
 
-    router.post('/register', (Request request) async {
+    router.post('/', (Request request) async {
       final requestBody = await request.readAsString();
-      final Map<String, dynamic> credentials = jsonDecode(requestBody);
+      final Map<String, dynamic> userInfo = jsonDecode(requestBody);
 
-      final String username = credentials['username'];
-      final String password = credentials['password'];
+      final String username = userInfo['username'];
+      final String password = userInfo['password'];
 
       // Check that credentials exist
+      // TODO check other info
       if (username == null ||
           password == null ||
           username.isEmpty ||
@@ -24,7 +25,7 @@ class AccountsController {
         return Response(400, body: "Please enter a username and password");
       }
 
-      //authModel.addUser();
+      return accountsModel.addUser(userInfo);
     });
 
     return router;
