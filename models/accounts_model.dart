@@ -52,7 +52,7 @@ Future<Response> addAccount(Map<String, dynamic> accountInfo) async {
     }
     // Catch-all other exceptions
     return Response.internalServerError(
-        body: 'Something went wrong on our side. Please try again later.');
+        body: 'Something went wrong on our end. Please try again later.');
   } finally {
     dbConnection.close();
   }
@@ -101,7 +101,7 @@ Future<Response> loginAccount(String username, String password) async {
     }
     // Catch-all other exceptions
     return Response.internalServerError(
-        body: 'Something went wrong on our side. Please try again later.');
+        body: 'Something went wrong on our end. Please try again later.');
   } finally {
     dbConnection.close();
   }

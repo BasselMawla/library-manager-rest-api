@@ -16,8 +16,16 @@ class BooksController {
   Handler get handler {
     final router = Router();
 
-    router.get('/', (Request request) {
-      return Response.ok('BoooksController returned');
+    router.get('/', (Request request) async {
+      // Check that a librarian is logged in
+      final jwtAuth = request.context['jwtAuth'] as JWT;
+      final accountId = jwtAuth.subject;
+      final isAllowed = await isLibrarian(accountId);
+      if (!isAllowed) {
+        return Response.forbidden('Not allowed! Must be a librarian.');
+      }
+
+      return await booksModel.getBookStockList();
     });
 
     // Add a book
@@ -37,7 +45,7 @@ class BooksController {
 
       // TODO: First check that all data needed is included
 
-      return booksModel.addBook(book, accountId);
+      return await booksModel.addBook(book, accountId);
     });
 
     // Authorize librarians only

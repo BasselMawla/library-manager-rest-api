@@ -1,5 +1,6 @@
 // models/books_model.dart
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:mysql1/mysql1.dart';
@@ -33,7 +34,32 @@ addBook(Map<String, dynamic> book, String librarianId) async {
   return Response.ok("Book added.");
 }
 
-Future<Response> getBooks() async {}
+Future<Response> getBookStockList() async {
+  MySqlConnection dbConnection = await database.createConnection();
+
+  try {
+    Results results = await dbConnection.query(
+        'SELECT DISTINCT(isbn), COUNT(isbn) as stock FROM book GROUP BY isbn LIMIT 25');
+
+    Map<String, dynamic> books = Map<String, dynamic>();
+
+    int i = 1;
+    for (var row in results) {
+      books[i.toString()] = row.fields;
+      i++;
+    }
+
+    return Response.ok(jsonEncode(books), headers: {
+      HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+    });
+  } catch (e) {
+    print(e);
+    return Response.internalServerError(
+        body: 'Something went wrong on our end. Please try again later.');
+  } finally {
+    dbConnection.close();
+  }
+}
 
 bool isValidInput(Map<String, dynamic> book) {
   // TODO
