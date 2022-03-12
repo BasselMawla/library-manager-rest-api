@@ -33,12 +33,12 @@ Future<Response> addAccount(Map<String, dynamic> accountInfo) async {
         ]);
 
     print('User inserted. Affected rows: ${result.affectedRows}');
-    return Response(201, body: 'Account registered.');
+    return Response(HttpStatus.created, body: 'Account registered.');
   } on MySqlException catch (e) {
     print(e);
     // Duplicate entry error
     if (e.errorNumber == 1062) {
-      return Response(409, body: "Username already exists!");
+      return Response(HttpStatus.conflict, body: "Username already exists!");
     }
     // Other MySqlException errors
     return Response.internalServerError(body: e.message);
@@ -77,11 +77,14 @@ Future<Response> loginAccount(String username, String password) async {
     // Username found. Compare password.
     final dbAccount = iterator.current;
     final hashedPassword = hashPassword(password, dbAccount['salt']);
-    if (hashedPassword == dbAccount['password']) {
-      return Response.ok("Login successful.");
+
+    if (hashedPassword != dbAccount['password']) {
+      return Response.forbidden("Wrong username or password.");
     }
 
-    return Response(401, body: "Wrong password.");
+    // TODO: Create JWT to return with response
+
+    return Response.ok("Login successful.");
     //} on MySqlException catch (e) {
     //print(e);
     //return Response.internalServerError(body: e.message);

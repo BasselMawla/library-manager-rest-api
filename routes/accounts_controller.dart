@@ -1,5 +1,7 @@
 // routes/accounts_controller.dart
 
+import 'dart:html';
+
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'dart:convert' show jsonDecode, JsonEncoder;
@@ -41,13 +43,14 @@ class AccountsController {
           credentials['username'],
           credentials['password'],
         ])) {
-          return Response(400, body: "Please enter a username and password.");
+          return Response(HttpStatus.badRequest,
+              body: "Please enter a username and password.");
         }
         return accountsModel.loginAccount(
             credentials['username'], credentials['password']);
       } on FormatException catch (e) {
         print(e);
-        return Response(400, body: "Invalid JSON!");
+        return Response(HttpStatus.badRequest, body: "Invalid JSON!");
       }
     });
 
