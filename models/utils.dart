@@ -3,6 +3,9 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
+import 'package:dotenv/dotenv.dart' show env;
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:shelf/shelf.dart';
 
 String generateSalt() {
   final random = Random.secure();
@@ -30,4 +33,48 @@ bool isMissingInput(List<String> keys) {
     }
   }
   return false;
+}
+
+String generateJwt(String account_id) {
+  //String username, bool isLibrarian) {
+  final jwt = JWT(
+    {
+      'iat': DateTime.now().millisecondsSinceEpoch,
+    },
+    subject: account_id,
+    issuer: env['issuer'],
+  );
+  return jwt.sign(SecretKey(env['secret']));
+}
+
+verifyJwt(String token) {
+  try {
+    final jwt = JWT.verify(token, SecretKey(env['secret']));
+    return jwt;
+  } on JWTExpiredError {
+    print('jwt expired');
+  } on JWTError catch (e) {
+    print(e.message); // e: invalid signature
+  }
+}
+
+Middleware handleAuth(String secret) {
+  return (Handler handler) {
+    return (Request request) async {
+      final authHeader = request.headers['authorization'];
+      var jwt;
+
+      if (authHeader != null && authHeader.startsWith('Bearer ')) {
+        String token =
+            authHeader.substring(7); // Token is whatever is after 'Bearer '
+        jwt = verifyJwt(token);
+      }
+
+      final updatedRequest = request.change(context: {
+        'jwtAuth': jwt,
+      });
+      // Continue with updated request
+      return await handler(updatedRequest);
+    };
+  };
 }

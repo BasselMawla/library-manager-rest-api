@@ -1,10 +1,7 @@
 import 'package:mysql1/mysql1.dart';
-import 'package:dotenv/dotenv.dart' show load, env;
+import 'package:dotenv/dotenv.dart' show env;
 
 Future<MySqlConnection> createConnection() async {
-  // Load environment variables from .env file
-  load();
-
   final MySqlConnection dbConnection =
       await MySqlConnection.connect(ConnectionSettings(
     host: env['databaseHost'],

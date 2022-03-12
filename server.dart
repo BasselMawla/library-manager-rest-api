@@ -1,10 +1,13 @@
 // server.dart
 
+import 'package:dotenv/dotenv.dart' show load;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'route_handler.dart';
 
 void main() async {
+  load();
+
   final route_handler = const Pipeline()
       .addMiddleware(logRequests())
       .addHandler(RouteHandler().handler);

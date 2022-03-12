@@ -1,17 +1,24 @@
 // models/books_model.dart
 
+import 'dart:io';
+
 import 'package:mysql1/mysql1.dart';
+import 'package:shelf/shelf.dart';
 import '../database_connection.dart' as database;
 
+// TODO: Rewrite to new standards
 addBook(Map<String, dynamic> book) async {
   if (!isValidInput(book)) {
     // Guard statement, return error/fail
     // TODO
   }
 
+  // TODO: Authorize librarians only
+
   MySqlConnection dbConnection = await database.createConnection();
 
   // Insert the book
+  // TODO: try catch
   Results result = await dbConnection.query(
       'INSERT INTO book (book_id, isbn, title, author, dewey_number, added_on) ' +
           'VALUE (UUID(), ?, ?, ?, ?, now())',
@@ -21,10 +28,13 @@ addBook(Map<String, dynamic> book) async {
         book['author'],
         book['dewey_number'],
       ]);
-  print('Book inserted. Affected rows: ${result.affectedRows}');
+  print('Book added. Affected rows: ${result.affectedRows}');
 
   dbConnection.close();
+  return Response.ok("Book added.");
 }
+
+Future<Response> getBooks() async {}
 
 bool isValidInput(Map<String, dynamic> book) {
   // TODO

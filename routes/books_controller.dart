@@ -23,14 +23,10 @@ class BooksController {
     router.post('/', (Request request) async {
       final requestBody = await request.readAsString();
       Map<String, dynamic> book = jsonDecode(requestBody);
+
       // TODO: First check that all data needed is included
-      booksModel.addBook(book);
 
-      // TODO: Just return a success message, no need to display the book
-      // Using JsonEncoder to make the JSON human readable
-      JsonEncoder encoder = new JsonEncoder.withIndent('  ');
-
-      return Response.ok(encoder.convert(book));
+      return booksModel.addBook(book);
     });
     return router;
   }

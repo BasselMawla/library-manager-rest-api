@@ -1,7 +1,9 @@
 // /models/authModel.dart
 
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:dotenv/dotenv.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:shelf/shelf.dart';
 import 'dart:async';
@@ -72,19 +74,23 @@ Future<Response> loginAccount(String username, String password) async {
 
     Iterator iterator = results.iterator;
     if (!iterator.moveNext()) {
-      return Response.notFound("Username does not exist.");
+      return Response.notFound('Username does not exist.');
     }
     // Username found. Compare password.
-    final dbAccount = iterator.current;
-    final hashedPassword = hashPassword(password, dbAccount['salt']);
+    final account = iterator.current;
+    final hashedPassword = hashPassword(password, account['salt']);
 
-    if (hashedPassword != dbAccount['password']) {
+    if (hashedPassword != account['password']) {
       return Response.forbidden("Wrong username or password.");
     }
 
-    // TODO: Create JWT to return with response
+    // Generate JWT to return with response
+    final jwt = generateJwt(account['account_id'].toString());
 
-    return Response.ok("Login successful.");
+    return Response.ok(json.encode({'jwt': jwt}), headers: {
+      HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+    });
+
     //} on MySqlException catch (e) {
     //print(e);
     //return Response.internalServerError(body: e.message);
