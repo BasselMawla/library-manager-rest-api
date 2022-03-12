@@ -5,7 +5,9 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:dotenv/dotenv.dart' show env;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:mysql1/mysql1.dart';
 import 'package:shelf/shelf.dart';
+import '../database_connection.dart' as database;
 
 String generateSalt() {
   final random = Random.secure();
@@ -33,6 +35,35 @@ bool isMissingInput(List<String> keys) {
     }
   }
   return false;
+}
+
+Future<bool> isLibrarian(String accountId) async {
+  if (accountId == null || accountId.isEmpty) {
+    return false;
+  }
+
+  MySqlConnection dbConnection = await database.createConnection();
+
+  try {
+    Results results = await dbConnection.query(
+        'SELECT is_librarian FROM account WHERE account_id = ?', [accountId]);
+
+    Iterator iterator = results.iterator;
+    // If account not found
+    if (!iterator.moveNext()) {
+      return false;
+    }
+    // If is_librarian is true
+    if (iterator.current['is_librarian'] == 1) {
+      return true;
+    }
+    return false;
+  } catch (e) {
+    print(e);
+    return false;
+  } finally {
+    dbConnection.close();
+  }
 }
 
 String generateJwt(String account_id) {
@@ -79,11 +110,14 @@ Middleware handleAuth() {
   };
 }
 
-Middleware authLibrarians() {
+Middleware checkAuth() {
   return createMiddleware(
     requestHandler: (Request request) {
-      if (request.context['jwtAuth'] == null) {
-        return Response.forbidden('Not allowed: must be a librarian');
+      final jwtAuth = request.context['jwtAuth'] as JWT;
+      if (jwtAuth == null ||
+          jwtAuth.subject == null ||
+          jwtAuth.subject.isEmpty) {
+        return Response.forbidden('Not allowed! Please log in.');
       }
       // Continue down the pipeline
       return null;

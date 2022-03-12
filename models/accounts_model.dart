@@ -54,7 +54,6 @@ Future<Response> addAccount(Map<String, dynamic> accountInfo) async {
     return Response.internalServerError(
         body: 'Something went wrong on our side. Please try again later.');
   } finally {
-    print("Closing connection to DB");
     dbConnection.close();
   }
 }
@@ -104,7 +103,6 @@ Future<Response> loginAccount(String username, String password) async {
     return Response.internalServerError(
         body: 'Something went wrong on our side. Please try again later.');
   } finally {
-    print("Closing connection to DB");
     dbConnection.close();
   }
 }
