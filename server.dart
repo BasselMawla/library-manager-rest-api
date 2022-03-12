@@ -3,6 +3,7 @@
 import 'package:dotenv/dotenv.dart' show load;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
+import 'models/utils.dart';
 import 'route_handler.dart';
 
 void main() async {
@@ -10,6 +11,7 @@ void main() async {
 
   final route_handler = const Pipeline()
       .addMiddleware(logRequests())
+      .addMiddleware(handleAuth())
       .addHandler(RouteHandler().handler);
 
   final server = await shelf_io.serve(

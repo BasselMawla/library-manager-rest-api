@@ -58,7 +58,7 @@ verifyJwt(String token) {
   }
 }
 
-Middleware handleAuth(String secret) {
+Middleware handleAuth() {
   return (Handler handler) {
     return (Request request) async {
       final authHeader = request.headers['authorization'];
@@ -77,4 +77,16 @@ Middleware handleAuth(String secret) {
       return await handler(updatedRequest);
     };
   };
+}
+
+Middleware authLibrarians() {
+  return createMiddleware(
+    requestHandler: (Request request) {
+      if (request.context['jwtAuth'] == null) {
+        return Response.forbidden('Not allowed: must be a librarian');
+      }
+      // Continue down the pipeline
+      return null;
+    },
+  );
 }

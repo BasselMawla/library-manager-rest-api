@@ -13,8 +13,6 @@ addBook(Map<String, dynamic> book) async {
     // TODO
   }
 
-  // TODO: Authorize librarians only
-
   MySqlConnection dbConnection = await database.createConnection();
 
   // Insert the book

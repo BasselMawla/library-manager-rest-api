@@ -12,7 +12,7 @@ class RouteHandler {
   Handler get handler {
     final router = Router();
 
-    router.mount('/books', BooksController().router);
+    router.mount('/books', BooksController().handler);
     router.mount('/accounts', AccountsController().router);
 
     // All invalid URLs
