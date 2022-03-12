@@ -7,7 +7,7 @@ import 'package:shelf/shelf.dart';
 import '../database_connection.dart' as database;
 
 // TODO: Rewrite to new standards
-addBook(Map<String, dynamic> book) async {
+addBook(Map<String, dynamic> book, String librarianId) async {
   if (!isValidInput(book)) {
     // Guard statement, return error/fail
     // TODO
@@ -18,13 +18,14 @@ addBook(Map<String, dynamic> book) async {
   // Insert the book
   // TODO: try catch
   Results result = await dbConnection.query(
-      'INSERT INTO book (book_id, isbn, title, author, dewey_number, added_on) ' +
-          'VALUE (UUID(), ?, ?, ?, ?, now())',
+      'INSERT INTO book (book_id, isbn, title, author, dewey_number, librarian_id, added_on) ' +
+          'VALUE (UUID(), ?, ?, ?, ?, ?, now())',
       [
         book['isbn'],
         book['title'],
         book['author'],
         book['dewey_number'],
+        librarianId,
       ]);
   print('Book added. Affected rows: ${result.affectedRows}');
 

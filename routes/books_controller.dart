@@ -26,7 +26,8 @@ class BooksController {
     router.post('/', (Request request) async {
       // Check that a librarian is logged in
       final jwtAuth = request.context['jwtAuth'] as JWT;
-      final isAllowed = await isLibrarian(jwtAuth.subject);
+      final accountId = jwtAuth.subject;
+      final isAllowed = await isLibrarian(accountId);
       if (!isAllowed) {
         return Response.forbidden('Not allowed! Must be a librarian.');
       }
@@ -36,7 +37,7 @@ class BooksController {
 
       // TODO: First check that all data needed is included
 
-      return booksModel.addBook(book);
+      return booksModel.addBook(book, accountId);
     });
 
     // Authorize librarians only
