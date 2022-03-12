@@ -70,7 +70,8 @@ String generateJwt(String account_id) {
   //String username, bool isLibrarian) {
   final jwt = JWT(
     {
-      'iat': DateTime.now().millisecondsSinceEpoch,
+      // Set the token to expire in 48 hours
+      'exp': DateTime.now().millisecondsSinceEpoch ~/ 1000 + 172800,
     },
     subject: account_id,
     issuer: env['issuer'],
