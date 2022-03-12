@@ -39,7 +39,11 @@ Future<Response> getBookStockList() async {
 
   try {
     Results results = await dbConnection.query(
-        'SELECT DISTINCT(isbn), COUNT(isbn) as stock FROM book GROUP BY isbn LIMIT 25');
+        'SELECT isbn as ISBN, author as "Primary Author", COUNT(isbn) as Stock ' +
+            'FROM book ' +
+            'GROUP BY isbn ' +
+            'ORDER BY isbn ' +
+            'LIMIT 25');
 
     Map<String, dynamic> books = Map<String, dynamic>();
 
