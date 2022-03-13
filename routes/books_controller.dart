@@ -4,7 +4,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'dart:convert' show jsonDecode, JsonEncoder;
-import '../models/books_model.dart' as booksModel;
+import '../models/books_model.dart' as BooksModel;
 
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
@@ -25,7 +25,7 @@ class BooksController {
         return Response.forbidden('Not allowed! Must be a librarian.');
       }
 
-      return await booksModel.getBookStockList();
+      return await BooksModel.getBookStockList();
     });
 
     // Add a book
@@ -48,7 +48,7 @@ class BooksController {
       if (book['quantity'] == null || book['quantity'] < 1) {
         book['quantity'] = 1;
       }
-      return await booksModel.addBook(book, accountId);
+      return await BooksModel.addBook(book, accountId);
     });
 
     // Authorize librarians only

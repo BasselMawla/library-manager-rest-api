@@ -47,13 +47,13 @@ Future<Response> getBookStockList() async {
             'ORDER BY isbn ' +
             'LIMIT 25');
 
-    Map<String, dynamic> books = Map<String, dynamic>();
-
-    int i = 1;
+    List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
-      books[i.toString()] = row.fields;
-      i++;
+      resultsList.add(row.fields);
     }
+
+    Map books = Map<String, dynamic>();
+    books['results'] = resultsList;
 
     return Response.ok(jsonEncode(books), headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
