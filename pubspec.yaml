@@ -10,3 +10,4 @@ dependencies:
   shelf_router: any
   mysql1: any
   dotenv: any
+  dart_jsonwebtoken: any
