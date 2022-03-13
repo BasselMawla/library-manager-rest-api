@@ -44,7 +44,10 @@ class BooksController {
       Map<String, dynamic> book = jsonDecode(requestBody);
 
       // TODO: First check that all data needed is included
-
+      // quantity should be between 1-10
+      if (book['quantity'] == null || book['quantity'] < 1) {
+        book['quantity'] = 1;
+      }
       return await booksModel.addBook(book, accountId);
     });
 
