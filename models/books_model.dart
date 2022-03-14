@@ -41,7 +41,7 @@ Future<Response> getBookStockList() async {
 
   try {
     Results results = await dbConnection.query(
-        'SELECT isbn as ISBN, author as "Primary Author", COUNT(isbn) as Stock ' +
+        'SELECT isbn, author as "primary_author", COUNT(isbn) as stock ' +
             'FROM book ' +
             'GROUP BY isbn ' +
             'ORDER BY isbn ' +

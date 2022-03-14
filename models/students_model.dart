@@ -13,9 +13,10 @@ Future<Response> getAllStudents() async {
   try {
     // TODO: Retrieve their borrowing records as well
     Results results = await dbConnection.query(
-        'SELECT first_name as "First Name", last_name as "Last Name" ' +
-            'FROM account ' +
-            'WHERE is_librarian = 0 ' +
+        'SELECT first_name as "first_name", last_name as "last_name", COUNT(borrower_id) as "brrowing_count" ' +
+            'FROM account, book ' +
+            'WHERE is_librarian = 0 AND borrower_id = account_id ' +
+            'GROUP BY borrower_id ' +
             'LIMIT 25');
 
     List<Map> resultsList = <Map<String, dynamic>>[];
