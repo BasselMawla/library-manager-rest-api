@@ -1,14 +1,16 @@
 // models/books_model.dart
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:mysql1/mysql1.dart';
 import 'package:shelf/shelf.dart';
 import '../database_connection.dart' as database;
+import 'utils.dart';
 
 // TODO: Rewrite to new standards
-addBook(Map<String, dynamic> book, String librarianId) async {
+Future<Response> addBook(Map<String, dynamic> book, String librarianId) async {
   if (!isValidInput(book)) {
     // Guard statement, return error/fail
     // TODO
@@ -60,6 +62,40 @@ Future<Response> getBookStockList() async {
     });
   } catch (e) {
     print(e);
+    return Response.internalServerError(
+        body: 'Something went wrong on our end. Please try again later.');
+  } finally {
+    dbConnection.close();
+  }
+}
+
+Future<Response> returnBook(String uuid) async {
+  if (!await isAlreadyBorrowed(uuid)) {
+    return Response(HttpStatus.conflict, body: "Book is not borrowed!");
+  }
+
+  MySqlConnection dbConnection = await database.createConnection();
+  try {
+    Results result = await dbConnection.query(
+        'UPDATE book ' +
+            'SET borrower_id = null, borrowed_on = null ' +
+            'WHERE book_id = ?  ',
+        [uuid]);
+
+    print('Book Returned. Affected rows: ${result.affectedRows}');
+
+    return Response(HttpStatus.noContent, body: 'Book returned.');
+  } on MySqlException catch (e) {
+    print(e);
+    // Other MySqlException errors
+    return Response.internalServerError(body: e.message);
+  } catch (e) {
+    print(e);
+    if (e is TimeoutException || e is SocketException) {
+      return Response.internalServerError(
+          body: 'Connection failed. Please try again later.');
+    }
+    // Catch-all other exceptions
     return Response.internalServerError(
         body: 'Something went wrong on our end. Please try again later.');
   } finally {

@@ -16,12 +16,10 @@ class BooksController {
   Handler get handler {
     final router = Router();
 
+    // Get all books and their stock
     router.get('/', (Request request) async {
       // Check that a librarian is logged in
-      final jwtAuth = request.context['jwtAuth'] as JWT;
-      final accountId = jwtAuth.subject;
-      final isAllowed = await isLibrarian(accountId);
-      if (!isAllowed) {
+      if (!await isLibrarian(request)) {
         return Response.forbidden('Not allowed! Must be a librarian.');
       }
 
@@ -29,14 +27,11 @@ class BooksController {
     });
 
     // Add a book
-    // TODO: auth and allow adding multiple copies
-    // TODO: Add delete ?and update?
     router.post('/', (Request request) async {
+      // TODO: auth and allow adding multiple copies
+      // TODO: Add delete ?and update?
       // Check that a librarian is logged in
-      final jwtAuth = request.context['jwtAuth'] as JWT;
-      final accountId = jwtAuth.subject;
-      final isAllowed = await isLibrarian(accountId);
-      if (!isAllowed) {
+      if (!await isLibrarian(request)) {
         return Response.forbidden('Not allowed! Must be a librarian.');
       }
 
@@ -48,7 +43,17 @@ class BooksController {
       if (book['quantity'] == null || book['quantity'] < 1) {
         book['quantity'] = 1;
       }
-      return await BooksModel.addBook(book, accountId);
+      return await BooksModel.addBook(book, getIdFromJwt(request));
+    });
+
+    // Return a book
+    router.post('/<uuid>', (Request request, String uuid) async {
+      // Check that a librarian is logged in
+      if (!await isLibrarian(request)) {
+        return Response.forbidden('Not allowed! Must be a librarian.');
+      }
+
+      return BooksModel.returnBook(uuid);
     });
 
     // Authorize librarians only

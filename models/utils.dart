@@ -38,7 +38,13 @@ bool isMissingInput(List<String> keys) {
   return false;
 }
 
-Future<bool> isLibrarian(String accountId) async {
+String getIdFromJwt(Request request) {
+  final jwtAuth = request.context['jwtAuth'] as JWT;
+  return jwtAuth.subject;
+}
+
+Future<bool> isLibrarian(Request request) async {
+  final accountId = getIdFromJwt(request);
   if (accountId == null || accountId.isEmpty) {
     return false;
   }

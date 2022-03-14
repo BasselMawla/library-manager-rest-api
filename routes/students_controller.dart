@@ -14,12 +14,10 @@ class StudentsController {
   Handler get handler {
     final router = Router();
 
+    // Get all students and their borrow count
     router.get('/', (Request request) async {
       // Check that a librarian is logged in
-      final jwtAuth = request.context['jwtAuth'] as JWT;
-      final accountId = jwtAuth.subject;
-      final isAllowed = await isLibrarian(accountId);
-      if (!isAllowed) {
+      if (!await isLibrarian(request)) {
         return Response.forbidden('Not allowed! Must be a librarian.');
       }
 
@@ -27,12 +25,12 @@ class StudentsController {
     });
 
     // TODO: Regex username
+    // Get student and record
     router.get('/<username>', (Request request, String username) async {
       // Check if librarian or student's own account
-      final jwtAuth = request.context['jwtAuth'] as JWT;
-      final accountId = jwtAuth.subject;
+      final accountId = getIdFromJwt(request);
       final loggedInUsername = await getUsernameFromId(accountId);
-      final isLoggedInLibrarian = await isLibrarian(accountId);
+      final isLoggedInLibrarian = await isLibrarian(request);
 
       // Not logged in as librarian or same username
       if (loggedInUsername != username && !isLoggedInLibrarian) {
@@ -42,13 +40,10 @@ class StudentsController {
       return StudentsModel.getStudent(username);
     });
 
-    // Librarians can lend a book to a student
+    // Lend a book to a student
     router.post('/<username>', (Request request, String username) async {
       // Check if librarian
-      final jwtAuth = request.context['jwtAuth'] as JWT;
-      final accountId = jwtAuth.subject;
-      final isAllowed = await isLibrarian(accountId);
-      if (!isAllowed) {
+      if (!await isLibrarian(request)) {
         return Response.forbidden('Not allowed! Must be a librarian.');
       }
 
