@@ -8,6 +8,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:shelf/shelf.dart';
 import '../database_connection.dart' as database;
+import 'package:intl/intl.dart' show DateFormat;
 
 String generateSalt() {
   final random = Random.secure();
@@ -37,7 +38,13 @@ bool isMissingInput(List<String> keys) {
   return false;
 }
 
-Future<bool> isLibrarian(String accountId) async {
+String getIdFromJwt(Request request) {
+  final jwtAuth = request.context['jwtAuth'] as JWT;
+  return jwtAuth.subject;
+}
+
+Future<bool> isLibrarian(Request request) async {
+  final accountId = getIdFromJwt(request);
   if (accountId == null || accountId.isEmpty) {
     return false;
   }
@@ -64,6 +71,78 @@ Future<bool> isLibrarian(String accountId) async {
   } finally {
     dbConnection.close();
   }
+}
+
+Future<String> getUsernameFromId(String account_id) async {
+  MySqlConnection dbConnection = await database.createConnection();
+
+  try {
+    Results results = await dbConnection.query(
+        'SELECT username FROM account WHERE account_id = ?', [account_id]);
+
+    Iterator iterator = results.iterator;
+    // If account not found
+    if (!iterator.moveNext()) {
+      return null;
+    }
+    return iterator.current['username'];
+  } catch (e) {
+    print(e);
+    return null;
+  } finally {
+    dbConnection.close();
+  }
+}
+
+Future<int> getIdFromUsername(String username) async {
+  MySqlConnection dbConnection = await database.createConnection();
+
+  try {
+    Results results = await dbConnection
+        .query('SELECT account_id FROM account WHERE username = ?', [username]);
+
+    Iterator iterator = results.iterator;
+    // If account not found
+    if (!iterator.moveNext()) {
+      return null;
+    }
+    return iterator.current['account_id'];
+  } catch (e) {
+    print(e);
+    return null;
+  } finally {
+    dbConnection.close();
+  }
+}
+
+Future<bool> isAlreadyBorrowed(String uuid) async {
+  MySqlConnection dbConnection = await database.createConnection();
+
+  try {
+    Results results = await dbConnection
+        .query('SELECT borrower_id FROM book WHERE book_id = ?', [uuid]);
+
+    Iterator iterator = results.iterator;
+    // If book not found
+    if (!iterator.moveNext()) {
+      return false;
+    }
+    if (iterator.current['borrower_id'] != null) {
+      return true;
+    }
+    return false;
+  } catch (e) {
+    print(e);
+    return false;
+  } finally {
+    dbConnection.close();
+  }
+}
+
+String getDueDate(DateTime borrowedOn) {
+  final dueDate = borrowedOn.add(const Duration(days: 7));
+  final formattedDate = DateFormat('dd-MM-yyyy').format(dueDate);
+  return formattedDate.toString();
 }
 
 String generateJwt(String account_id) {

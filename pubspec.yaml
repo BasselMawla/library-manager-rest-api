@@ -11,3 +11,4 @@ dependencies:
   mysql1: any
   dotenv: any
   dart_jsonwebtoken: any
+  intl: ^0.17.0

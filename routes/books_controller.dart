@@ -1,14 +1,11 @@
 // routes/books_controller.dart
 
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
-import 'dart:convert' show jsonDecode, JsonEncoder;
+
+import 'dart:convert' show jsonDecode;
+
 import '../models/books_model.dart' as BooksModel;
-
-import 'package:crypto/crypto.dart';
-import 'dart:convert';
-
 import '../models/utils.dart'; // for the utf8.encode method
 
 // Books Collection Routes
@@ -16,12 +13,10 @@ class BooksController {
   Handler get handler {
     final router = Router();
 
+    // Get all books and their stock
     router.get('/', (Request request) async {
       // Check that a librarian is logged in
-      final jwtAuth = request.context['jwtAuth'] as JWT;
-      final accountId = jwtAuth.subject;
-      final isAllowed = await isLibrarian(accountId);
-      if (!isAllowed) {
+      if (!await isLibrarian(request)) {
         return Response.forbidden('Not allowed! Must be a librarian.');
       }
 
@@ -29,14 +24,11 @@ class BooksController {
     });
 
     // Add a book
-    // TODO: auth and allow adding multiple copies
-    // TODO: Add delete ?and update?
     router.post('/', (Request request) async {
+      // TODO: auth and allow adding multiple copies
+      // TODO: Add delete ?and update?
       // Check that a librarian is logged in
-      final jwtAuth = request.context['jwtAuth'] as JWT;
-      final accountId = jwtAuth.subject;
-      final isAllowed = await isLibrarian(accountId);
-      if (!isAllowed) {
+      if (!await isLibrarian(request)) {
         return Response.forbidden('Not allowed! Must be a librarian.');
       }
 
@@ -48,7 +40,17 @@ class BooksController {
       if (book['quantity'] == null || book['quantity'] < 1) {
         book['quantity'] = 1;
       }
-      return await BooksModel.addBook(book, accountId);
+      return await BooksModel.addBook(book, getIdFromJwt(request));
+    });
+
+    // Return a book
+    router.post('/<uuid>', (Request request, String uuid) async {
+      // Check that a librarian is logged in
+      if (!await isLibrarian(request)) {
+        return Response.forbidden('Not allowed! Must be a librarian.');
+      }
+
+      return BooksModel.returnBook(uuid);
     });
 
     // Authorize librarians only
