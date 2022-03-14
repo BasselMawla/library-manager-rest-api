@@ -66,6 +66,72 @@ Future<bool> isLibrarian(String accountId) async {
   }
 }
 
+Future<String> getUsernameFromId(String account_id) async {
+  MySqlConnection dbConnection = await database.createConnection();
+
+  try {
+    Results results = await dbConnection.query(
+        'SELECT username FROM account WHERE account_id = ?', [account_id]);
+
+    Iterator iterator = results.iterator;
+    // If account not found
+    if (!iterator.moveNext()) {
+      return null;
+    }
+    return iterator.current['username'];
+  } catch (e) {
+    print(e);
+    return null;
+  } finally {
+    dbConnection.close();
+  }
+}
+
+Future<int> getIdFromUsername(String username) async {
+  MySqlConnection dbConnection = await database.createConnection();
+
+  try {
+    Results results = await dbConnection
+        .query('SELECT account_id FROM account WHERE username = ?', [username]);
+
+    Iterator iterator = results.iterator;
+    // If account not found
+    if (!iterator.moveNext()) {
+      return null;
+    }
+    return iterator.current['account_id'];
+  } catch (e) {
+    print(e);
+    return null;
+  } finally {
+    dbConnection.close();
+  }
+}
+
+Future<bool> isAlreadyBorrowed(String uuid) async {
+  MySqlConnection dbConnection = await database.createConnection();
+
+  try {
+    Results results = await dbConnection
+        .query('SELECT borrower_id FROM book WHERE book_id = ?', [uuid]);
+
+    Iterator iterator = results.iterator;
+    // If book not found
+    if (!iterator.moveNext()) {
+      return false;
+    }
+    if (iterator.current['borrower_id'] != null) {
+      return true;
+    }
+    return false;
+  } catch (e) {
+    print(e);
+    return false;
+  } finally {
+    dbConnection.close();
+  }
+}
+
 String generateJwt(String account_id) {
   //String username, bool isLibrarian) {
   final jwt = JWT(
