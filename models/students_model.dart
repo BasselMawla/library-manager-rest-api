@@ -47,7 +47,7 @@ Future<Response> getStudent(String username) async {
 
   try {
     Results results = await dbConnection.query(
-        'SELECT title as book_title ' +
+        'SELECT title as book_title, borrowed_on ' +
             'FROM account, book ' +
             'WHERE username = ? AND account_id = borrower_id ' +
             'LIMIT 25',
@@ -55,6 +55,8 @@ Future<Response> getStudent(String username) async {
 
     List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
+      row.fields['due_date'] = getDueDate(row.fields['borrowed_on']);
+      row.fields.remove('borrowed_on');
       resultsList.add(row.fields);
     }
 
@@ -82,9 +84,11 @@ Future<Response> borrowBook(int account_id, String uuid) async {
         body: "Not available! Book already borrowed.");
   }
   try {
-    Results result = await dbConnection.query('UPDATE book ' +
-        'SET borrower_id = ?, borrowed_on = now() ' +
-        'WHERE book_id = ?  '[account_id]);
+    Results result = await dbConnection.query(
+        'UPDATE book ' +
+            'SET borrower_id = ?, borrowed_on = now() ' +
+            'WHERE book_id = ?  ',
+        [account_id, uuid]);
 
     print('Book borrowed. Affected rows: ${result.affectedRows}');
 

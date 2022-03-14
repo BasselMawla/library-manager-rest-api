@@ -8,6 +8,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:shelf/shelf.dart';
 import '../database_connection.dart' as database;
+import 'package:intl/intl.dart' show DateFormat;
 
 String generateSalt() {
   final random = Random.secure();
@@ -130,6 +131,12 @@ Future<bool> isAlreadyBorrowed(String uuid) async {
   } finally {
     dbConnection.close();
   }
+}
+
+String getDueDate(DateTime borrowedOn) {
+  final dueDate = borrowedOn.add(const Duration(days: 7));
+  final formattedDate = DateFormat('dd-MM-yyyy').format(dueDate);
+  return formattedDate.toString();
 }
 
 String generateJwt(String account_id) {
