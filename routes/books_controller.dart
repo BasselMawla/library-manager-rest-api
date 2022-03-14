@@ -1,14 +1,11 @@
 // routes/books_controller.dart
 
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
-import 'dart:convert' show jsonDecode, JsonEncoder;
+
+import 'dart:convert' show jsonDecode;
+
 import '../models/books_model.dart' as BooksModel;
-
-import 'package:crypto/crypto.dart';
-import 'dart:convert';
-
 import '../models/utils.dart'; // for the utf8.encode method
 
 // Books Collection Routes

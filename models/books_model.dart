@@ -21,6 +21,7 @@ Future<Response> addBook(Map<String, dynamic> book, String librarianId) async {
   // Insert the book
   // TODO: try catch
 
+  int affectedRows = 0;
   for (int i = 0; i < book['quantity']; i++) {
     Results result = await dbConnection.query(
         'INSERT INTO book (book_id, isbn, title, author, dewey_number, librarian_id, added_on) ' +
@@ -32,10 +33,11 @@ Future<Response> addBook(Map<String, dynamic> book, String librarianId) async {
           book['dewey_number'],
           librarianId,
         ]);
+    affectedRows += result.affectedRows;
   }
 
   dbConnection.close();
-  return Response.ok("Book added.");
+  return Response.ok("Book added. Affected rows: $affectedRows");
 }
 
 Future<Response> getBookStockList() async {
