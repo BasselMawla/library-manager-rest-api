@@ -13,8 +13,17 @@ class BooksController {
   Handler get handler {
     final router = Router();
 
-    // Get all books and their stock
+    // Get all books and their stock or search for a book
     router.get('/', (Request request) async {
+      // First check if this is a search request
+      String searchQuery = request.url.queryParameters['q'];
+      if (searchQuery != null && !searchQuery.isEmpty) {
+        // Search query found
+        return BooksModel.searchBooks(searchQuery);
+      }
+
+      // Not a search query, retrieve all books and their stocks
+
       // Check that a librarian is logged in
       if (!await isLibrarian(request)) {
         return Response.forbidden('Not allowed! Must be a librarian.');
