@@ -111,8 +111,6 @@ Future<Response> searchBooks(String searchQuery) async {
   final String finalQuery = buildSearchQuery(keywords);
   // Double the keywords to use them for both title and author
   final List finalValues = buildSearchValues(keywords);
-  print(finalQuery);
-  print(finalValues);
   MySqlConnection dbConnection = await database.createConnection();
 
   try {
@@ -139,9 +137,9 @@ Future<Response> searchBooks(String searchQuery) async {
 }
 
 String buildSearchQuery(List<String> keywords) {
-  final String queryStart =
-      'SELECT title, author as primary_author, COUNT(isbn) as stock ' +
-          'FROM book WHERE ';
+  final String queryStart = 'SELECT title, author as primary_author, ' +
+      'COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available ' +
+      'FROM book WHERE ';
   final String queryEnd = ' GROUP BY isbn ORDER BY author, title';
 
   String titleQuery = 'title LIKE ?';
