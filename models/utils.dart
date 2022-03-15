@@ -148,10 +148,7 @@ String getDueDate(DateTime borrowedOn) {
 String generateJwt(String account_id) {
   //String username, bool isLibrarian) {
   final jwt = JWT(
-    {
-      // Set the token to expire in 48 hours
-      'exp': DateTime.now().millisecondsSinceEpoch ~/ 1000 + 172800,
-    },
+    {},
     subject: account_id,
     issuer: env['issuer'],
   );
@@ -164,8 +161,10 @@ verifyJwt(String token) {
     return jwt;
   } on JWTExpiredError {
     print('jwt expired');
+    return null;
   } on JWTError catch (e) {
     print(e.message); // e: invalid signature
+    return null;
   }
 }
 
@@ -179,6 +178,9 @@ Middleware handleAuth() {
         String token =
             authHeader.substring(7); // Token is whatever is after 'Bearer '
         jwt = verifyJwt(token);
+        if (jwt == null) {
+          return Response.forbidden("Please log in.");
+        }
       }
 
       final updatedRequest = request.change(context: {
