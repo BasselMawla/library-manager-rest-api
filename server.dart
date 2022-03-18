@@ -1,6 +1,6 @@
 // server.dart
 
-import 'package:dotenv/dotenv.dart' show load;
+//import 'package:dotenv/dotenv.dart' show load;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'models/utils.dart';
@@ -17,7 +17,7 @@ void main() async {
   final server = await shelf_io.serve(
     route_handler,
     '0.0.0.0',
-    5050,
+    8080,
   );
 
   print('Serving at http://${server.address.host}:${server.port}');
