@@ -7,7 +7,7 @@ import 'models/utils.dart';
 import 'route_handler.dart';
 
 void main() async {
-  load();
+  // load(); // Not needed for Heroku
 
   final route_handler = const Pipeline()
       .addMiddleware(logRequests())
@@ -16,7 +16,7 @@ void main() async {
 
   final server = await shelf_io.serve(
     route_handler,
-    'localhost',
+    '0.0.0.0',
     5050,
   );
 
