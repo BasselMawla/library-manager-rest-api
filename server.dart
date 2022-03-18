@@ -14,10 +14,12 @@ void main() async {
       .addMiddleware(handleAuth())
       .addHandler(RouteHandler().handler);
 
+  final port = int.parse(env['PORT'] ?? '8080');
+
   final server = await shelf_io.serve(
     route_handler,
     '0.0.0.0',
-    int.parse(env['PORT']),
+    port,
   );
 
   print('Serving at http://${server.address.host}:${server.port}');
