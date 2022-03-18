@@ -11,6 +11,7 @@ void main() async {
 
   final route_handler = const Pipeline()
       .addMiddleware(logRequests())
+      .addMiddleware(handleCors())
       .addMiddleware(handleAuth())
       .addHandler(RouteHandler().handler);
 

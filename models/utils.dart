@@ -168,6 +168,24 @@ verifyJwt(String token) {
   }
 }
 
+Middleware handleCors() {
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST',
+    'Access-Control-Allow-Headers': 'Origin, Content-Type',
+  };
+
+  return createMiddleware(requestHandler: (Request request) {
+    if (request.method == 'OPTIONS') {
+      return Response.ok('', headers: corsHeaders);
+    }
+    // Continue request
+    return null;
+  }, responseHandler: (Response response) {
+    return response.change(headers: corsHeaders);
+  });
+}
+
 Middleware handleAuth() {
   return (Handler handler) {
     return (Request request) async {
