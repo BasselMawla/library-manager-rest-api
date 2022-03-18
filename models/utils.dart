@@ -171,7 +171,7 @@ verifyJwt(String token) {
 Middleware handleCors() {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
+    'Access-Control-Allow-Methods': 'GET, POST',
     'Access-Control-Allow-Headers': 'Origin, Content-Type',
   };
 
