@@ -45,7 +45,7 @@ Future<Response> getBookStockList() async {
 
   try {
     Results results = await dbConnection.query(
-        'SELECT isbn, author as primary_author, COUNT(isbn) as stock ' +
+        'SELECT title, author, COUNT(isbn) as stock ' +
             'FROM book ' +
             'GROUP BY isbn ' +
             'ORDER BY isbn ' +
@@ -137,7 +137,7 @@ Future<Response> searchBooks(String searchQuery) async {
 }
 
 String buildSearchQuery(List<String> keywords) {
-  final String queryStart = 'SELECT title, author as primary_author, ' +
+  final String queryStart = 'SELECT title, author, ' +
       'COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available ' +
       'FROM book WHERE ';
   final String queryEnd = ' GROUP BY isbn ORDER BY author, title';

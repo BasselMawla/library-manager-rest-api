@@ -24,10 +24,13 @@ class BooksController {
 
       // Not a search query, retrieve all books and their stocks
 
-      // Check that a librarian is logged in
+      // TODO: Add this change to readme
+      // No need to be a librarian to look at or search for books
+      // Students can as well
+      /* Check that a librarian is logged in
       if (!await isLibrarian(request)) {
         return Response.forbidden('Not allowed! Must be a librarian.');
-      }
+      }*/
 
       return await BooksModel.getBookStockList();
     });
