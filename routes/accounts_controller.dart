@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
-import 'dart:convert' show jsonDecode;
+import 'dart:convert' show jsonDecode, jsonEncode;
 import '../models/accounts_model.dart' as accountsModel;
 import '../models/utils.dart';
 
@@ -39,14 +39,20 @@ class AccountsController {
       try {
         final username = request.headers['username'];
         final password = request.headers['password'];
+        print('username: ' + username);
+        print('password: ' + password);
 
         // Check that all info exists
         if (isMissingInput([
           username,
           password,
         ])) {
-          return Response(HttpStatus.badRequest,
-              body: "Please enter a username and password.");
+          return Response(
+            HttpStatus.badRequest,
+            // TODO Change errors to jsonEncode everywhere
+            body:
+                jsonEncode({"error": "Please enter a username and password."}),
+          );
         }
         return accountsModel.loginAccount(username, password);
       } on FormatException catch (e) {

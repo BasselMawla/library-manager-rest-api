@@ -1,6 +1,6 @@
 // server.dart
 
-import 'package:dotenv/dotenv.dart' show env;
+import 'package:dotenv/dotenv.dart' show env, load;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'models/utils.dart';

@@ -39,7 +39,7 @@ Future<Response> addAccount(Map<String, dynamic> accountInfo) async {
     print(e);
     // Duplicate entry error
     if (e.errorNumber == 1062) {
-      return Response(HttpStatus.conflict, body: "Username already exists!");
+      return Response(HttpStatus.conflict, body: 'Username already exists!');
     }
     // Other MySqlException errors
     return Response.internalServerError(body: e.message);
@@ -68,7 +68,7 @@ Future<Response> loginAccount(String username, String password) async {
   // Get the account if it exists
   try {
     Results results = await dbConnection.query(
-        'SELECT account_id, is_librarian FROM account WHERE username = ?',
+        'SELECT account_id, password, salt, is_librarian FROM account WHERE username = ?',
         [username]);
 
     Iterator iterator = results.iterator;
