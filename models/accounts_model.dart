@@ -67,8 +67,9 @@ Future<Response> loginAccount(String username, String password) async {
 
   // Get the account if it exists
   try {
-    Results results = await dbConnection
-        .query('SELECT * FROM account WHERE username = ?', [username]);
+    Results results = await dbConnection.query(
+        'SELECT account_id, is_librarian FROM account WHERE username = ?',
+        [username]);
 
     Iterator iterator = results.iterator;
     if (!iterator.moveNext()) {
@@ -85,9 +86,11 @@ Future<Response> loginAccount(String username, String password) async {
     // Generate JWT to return with response
     final jwt = generateJwt(account['account_id'].toString());
 
-    return Response.ok(json.encode({'jwt': jwt}), headers: {
-      HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
-    });
+    return Response.ok(
+        json.encode({'jwt': jwt, 'is_librarian': account['is_librarian']}),
+        headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+        });
 
     //} on MySqlException catch (e) {
     //print(e);

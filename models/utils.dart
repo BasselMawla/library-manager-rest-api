@@ -172,7 +172,8 @@ Middleware handleCors() {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST',
-    'Access-Control-Allow-Headers': 'Origin, Content-Type, Authorization',
+    'Access-Control-Allow-Headers':
+        'Origin, Content-Type, Authorization, username, password',
   };
 
   return createMiddleware(requestHandler: (Request request) {
