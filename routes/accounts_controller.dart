@@ -12,6 +12,7 @@ class AccountsController {
   Router get router {
     final router = Router();
 
+    // Register
     router.post('/', (Request request) async {
       final requestBody = await request.readAsString();
       try {
@@ -33,24 +34,24 @@ class AccountsController {
       }
     });
 
+    // Login
     router.get('/', (Request request) async {
-      final requestBody = await request.readAsString();
       try {
-        final Map<String, dynamic> credentials = jsonDecode(requestBody);
+        final username = request.headers['username'];
+        final password = request.headers['password'];
 
         // Check that all info exists
         if (isMissingInput([
-          credentials['username'],
-          credentials['password'],
+          username,
+          password,
         ])) {
           return Response(HttpStatus.badRequest,
               body: "Please enter a username and password.");
         }
-        return accountsModel.loginAccount(
-            credentials['username'], credentials['password']);
+        return accountsModel.loginAccount(username, password);
       } on FormatException catch (e) {
         print(e);
-        return Response(HttpStatus.badRequest, body: "Invalid JSON!");
+        return Response(HttpStatus.badRequest, body: "Invalid input!");
       }
     });
 
