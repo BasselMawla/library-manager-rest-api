@@ -214,11 +214,19 @@ Middleware handleAuth() {
 Middleware checkAuth() {
   return createMiddleware(
     requestHandler: (Request request) {
+      bool isBooksRequest =
+          (request.handlerPath == '/books' || request.handlerPath == '/books/');
+
+      // If only getting books, no need to auth
+      if (isBooksRequest && request.method == 'GET') {
+        return null;
+      }
       final jwtAuth = request.context['jwtAuth'] as JWT;
       if (jwtAuth == null ||
           jwtAuth.subject == null ||
           jwtAuth.subject.isEmpty) {
-        return Response.forbidden('Not allowed! Please log in.');
+        return Response.forbidden(
+            jsonEncode({'error': 'Not allowed! Please log in.'}));
       }
       // Continue down the pipeline
       return null;
