@@ -19,7 +19,7 @@ void main() async {
 
   final server = await shelf_io.serve(
     route_handler,
-    'localhost', //'0.0.0.0',
+    env['hostname'],
     port,
   );
 
