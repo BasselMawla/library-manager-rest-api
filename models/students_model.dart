@@ -15,7 +15,7 @@ Future<Response> getAllStudents() async {
   try {
     // Retrieve students and their borrowing records
     Results results = await dbConnection.query(
-        'SELECT first_name, last_name, COUNT(borrower_id) as "borrowing_count" ' +
+        'SELECT account_id, first_name, last_name, COUNT(borrower_id) as "borrowing_count" ' +
             'FROM account, book ' +
             'WHERE is_librarian = 0 AND borrower_id = account_id ' +
             'GROUP BY borrower_id ' +
