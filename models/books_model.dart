@@ -37,7 +37,7 @@ Future<Response> addBook(Map<String, dynamic> book, String librarianId) async {
   }
 
   dbConnection.close();
-  return Response.ok("Book added. Affected rows: $affectedRows");
+  return Response(HttpStatus.noContent);
 }
 
 Future<Response> getBookStockList() async {
