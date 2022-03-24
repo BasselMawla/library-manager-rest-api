@@ -139,8 +139,8 @@ Future<bool> isAlreadyBorrowed(String uuid) async {
   }
 }
 
-String getDueDate(DateTime borrowedOn) {
-  final dueDate = borrowedOn.add(const Duration(days: 7));
+String getDueDate(DateTime borrowedOn, int loan_days) {
+  final dueDate = borrowedOn.add(Duration(days: loan_days));
   final formattedDate = DateFormat('dd-MM-yyyy').format(dueDate);
   return formattedDate.toString();
 }

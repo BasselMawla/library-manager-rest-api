@@ -47,7 +47,7 @@ Future<Response> getStudent(String username) async {
 
   try {
     Results results = await dbConnection.query(
-        'SELECT title as book_title, borrowed_on ' +
+        'SELECT title as book_title, borrowed_on, loan_days' +
             'FROM account, book ' +
             'WHERE username = ? AND account_id = borrower_id ' +
             'LIMIT 25',
@@ -55,7 +55,8 @@ Future<Response> getStudent(String username) async {
 
     List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
-      row.fields['due_date'] = getDueDate(row.fields['borrowed_on']);
+      row.fields['due_date'] =
+          getDueDate(row.fields['borrowed_on'], row.fields['loan_days']);
       row.fields.remove('borrowed_on');
       resultsList.add(row.fields);
     }
