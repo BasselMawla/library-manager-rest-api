@@ -3,3 +3,4 @@
 .packages
 .env*
 .todo
+/.vs

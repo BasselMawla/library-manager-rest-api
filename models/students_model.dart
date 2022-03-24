@@ -78,6 +78,7 @@ Future<Response> getStudent(String username) async {
 }
 
 Future<Response> borrowBook(int account_id, String uuid) async {
+  // TODO: Check that book exists
   MySqlConnection dbConnection = await database.createConnection();
   // Check if book is already borrowed
   if (await isAlreadyBorrowed(uuid)) {
@@ -93,7 +94,7 @@ Future<Response> borrowBook(int account_id, String uuid) async {
 
     print('Book borrowed. Affected rows: ${result.affectedRows}');
 
-    return Response(HttpStatus.noContent, body: 'Book borrowed.');
+    return Response(HttpStatus.noContent);
   } on MySqlException catch (e) {
     print(e);
     // Other MySqlException errors
