@@ -39,8 +39,6 @@ class AccountsController {
       try {
         final username = request.headers['username'];
         final password = request.headers['password'];
-        print('username: ' + username);
-        print('password: ' + password);
 
         // Check that all info exists
         if (isMissingInput([

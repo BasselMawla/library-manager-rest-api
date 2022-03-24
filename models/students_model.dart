@@ -47,7 +47,7 @@ Future<Response> getStudent(String username) async {
 
   try {
     Results results = await dbConnection.query(
-        'SELECT title as book_title, borrowed_on, loan_days' +
+        'SELECT title as book_title, borrowed_on, loan_days ' +
             'FROM account, book ' +
             'WHERE username = ? AND account_id = borrower_id ' +
             'LIMIT 25',
