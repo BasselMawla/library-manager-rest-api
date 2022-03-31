@@ -15,6 +15,7 @@ class BooksController {
 
     // Get all books and their stock or search for a book
     router.get('/', (Request request) async {
+      // TODO: Allow anyone to see and search for books, not just logged in
       // First check if this is a search request
       String searchQuery = request.url.queryParameters['q'];
       if (searchQuery != null && !searchQuery.isEmpty) {

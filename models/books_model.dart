@@ -122,7 +122,7 @@ Future<Response> searchBooks(String searchQuery) async {
     }
 
     Map searchResults = Map<String, dynamic>();
-    searchResults['results'] = resultsList;
+    searchResults['books'] = resultsList;
 
     return Response.ok(jsonEncode(searchResults), headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.mimeType,

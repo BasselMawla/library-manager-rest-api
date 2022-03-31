@@ -36,7 +36,9 @@ Future<Response> getAllStudents() async {
     // TODO: Handle more errors
     print(e);
     return Response.internalServerError(
-        body: 'Something went wrong on our end. Please try again later.');
+        body: jsonEncode({
+      'error': 'Something went wrong on our end. Please try again later.'
+    }));
   } finally {
     dbConnection.close();
   }
@@ -71,7 +73,9 @@ Future<Response> getStudent(String username) async {
     // TODO: Handle more errors
     print(e);
     return Response.internalServerError(
-        body: 'Something went wrong on our end. Please try again later.');
+        body: jsonEncode({
+      'error': 'Something went wrong on our end. Please try again later.'
+    }));
   } finally {
     dbConnection.close();
   }
@@ -83,7 +87,7 @@ Future<Response> borrowBook(int account_id, String uuid) async {
   // Check if book is already borrowed
   if (await isAlreadyBorrowed(uuid)) {
     return Response(HttpStatus.conflict,
-        body: "Not available! Book already borrowed.");
+        body: jsonEncode({'error': 'Not available! Book already borrowed.'}));
   }
   try {
     Results result = await dbConnection.query(
@@ -103,11 +107,14 @@ Future<Response> borrowBook(int account_id, String uuid) async {
     print(e);
     if (e is TimeoutException || e is SocketException) {
       return Response.internalServerError(
-          body: 'Connection failed. Please try again later.');
+          body: jsonEncode(
+              {'error': 'Connection failed. Please try again later.'}));
     }
     // Catch-all other exceptions
     return Response.internalServerError(
-        body: 'Something went wrong on our end. Please try again later.');
+        body: jsonEncode({
+      'error': 'Something went wrong on our end. Please try again later.'
+    }));
   } finally {
     dbConnection.close();
   }

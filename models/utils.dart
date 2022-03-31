@@ -198,7 +198,8 @@ Middleware handleAuth() {
             authHeader.substring(7); // Token is whatever is after 'Bearer '
         jwt = verifyJwt(token);
         if (jwt == null) {
-          return Response.forbidden("Please log in.");
+          return Response.forbidden(
+              jsonEncode({'error': 'Not allowed! Please log in.'}));
         }
       }
 
