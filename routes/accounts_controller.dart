@@ -47,7 +47,6 @@ class AccountsController {
         ])) {
           return Response(
             HttpStatus.badRequest,
-            // TODO Change errors to jsonEncode everywhere
             body:
                 jsonEncode({"error": "Please enter a username and password."}),
           );

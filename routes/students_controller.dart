@@ -17,13 +17,13 @@ class StudentsController {
     router.get('/', (Request request) async {
       // Check that a librarian is logged in
       if (!await isLibrarian(request)) {
-        return Response.forbidden('Not allowed! Must be a librarian.');
+        return Response.forbidden(
+            jsonEncode({'error': 'Not allowed! Must be a librarian.'}));
       }
 
       return await StudentsModel.getAllStudents();
     });
 
-    // TODO: Regex username
     // Get student and record
     router.get('/<username>', (Request request, String username) async {
       // Check if librarian or student's own account
@@ -43,7 +43,8 @@ class StudentsController {
     router.post('/<username>', (Request request, String username) async {
       // Check if librarian
       if (!await isLibrarian(request)) {
-        return Response.forbidden('Not allowed! Must be a librarian.');
+        return Response.forbidden(
+            jsonEncode({'error': 'Not allowed! Must be a librarian.'}));
       }
 
       // Retrieve book UUID to add from JSON
@@ -53,13 +54,14 @@ class StudentsController {
 
         // Check that UUID exists
         if (isMissingInput([bookInfo['uuid']])) {
-          return Response(400, body: "Please enter book UUID.");
+          return Response(400,
+              body: jsonEncode({'error': 'Please enter book UUID.'}));
         }
         return StudentsModel.borrowBook(
             await getIdFromUsername(username), bookInfo['uuid']);
       } on FormatException catch (e) {
         print(e);
-        return Response(400, body: "Invalid JSON!");
+        return Response(400, body: jsonEncode({'error': 'Invalid JSON!'}));
       }
     });
 
