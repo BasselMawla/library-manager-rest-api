@@ -9,35 +9,40 @@ import 'package:shelf/shelf.dart';
 import '../database_connection.dart' as database;
 import 'utils.dart';
 
-// TODO: Rewrite to new standards
 Future<Response> addBook(Map<String, dynamic> book, String librarianId) async {
-  if (!isValidInput(book)) {
-    // Guard statement, return error/fail
-    // TODO
-  }
-
   MySqlConnection dbConnection = await database.createConnection();
 
   // Insert the book
-  // TODO: try catch
+  try {
+    for (int i = 0; i < book['quantity']; i++) {
+      await dbConnection.query(
+          'INSERT INTO book (book_id, isbn, title, author, dewey_number, librarian_id, added_on) ' +
+              'VALUE (UUID(), ?, ?, ?, ?, ?, now())',
+          [
+            book['isbn'],
+            book['title'],
+            book['author'],
+            book['dewey_number'],
+            librarianId,
+          ]);
+    }
 
-  int affectedRows = 0;
-  for (int i = 0; i < book['quantity']; i++) {
-    Results result = await dbConnection.query(
-        'INSERT INTO book (book_id, isbn, title, author, dewey_number, librarian_id, added_on) ' +
-            'VALUE (UUID(), ?, ?, ?, ?, ?, now())',
-        [
-          book['isbn'],
-          book['title'],
-          book['author'],
-          book['dewey_number'],
-          librarianId,
-        ]);
-    affectedRows += result.affectedRows;
+    return Response(HttpStatus.noContent);
+  } catch (e) {
+    print(e);
+    if (e is TimeoutException || e is SocketException) {
+      return Response.internalServerError(
+          body: jsonEncode(
+              {'error': 'Connection failed. Please try again later.'}));
+    }
+    // Catch-all other exceptions
+    return Response.internalServerError(
+        body: jsonEncode({
+      'error': 'Something went wrong on our end. Please try again later.'
+    }));
+  } finally {
+    dbConnection.close();
   }
-
-  dbConnection.close();
-  return Response(HttpStatus.noContent);
 }
 
 Future<Response> getBookStockList() async {
@@ -130,7 +135,9 @@ Future<Response> searchBooks(String searchQuery) async {
   } catch (e) {
     print(e);
     return Response.internalServerError(
-        body: 'Something went wrong on our end. Please try again later.');
+        body: jsonEncode({
+      'error': 'Something went wrong on our end. Please try again later.'
+    }));
   } finally {
     dbConnection.close();
   }
@@ -168,9 +175,4 @@ List buildSearchValues(List<String> keywords) {
     }
   }
   return finalValues;
-}
-
-bool isValidInput(Map<String, dynamic> book) {
-  // TODO
-  return false;
 }
