@@ -1,5 +1,7 @@
 // routes/books_controller.dart
 
+import 'dart:io';
+
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
@@ -48,7 +50,11 @@ class BooksController {
       // Check that a librarian is logged in
       if (!await isLibrarian(request)) {
         return Response.forbidden(
-            jsonEncode({'error': 'Not allowed! Must be a librarian.'}));
+          jsonEncode({'error': 'Not allowed! Must be a librarian.'}),
+          headers: {
+            HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+          },
+        );
       }
 
       return BooksModel.returnBook(uuid);

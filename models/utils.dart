@@ -1,6 +1,7 @@
 // models/utils.dart
 
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:dotenv/dotenv.dart' show env;
@@ -223,7 +224,11 @@ Middleware handleAuth() {
         jwt = verifyJwt(token);
         if (jwt == null) {
           return Response.forbidden(
-              jsonEncode({'error': 'Not allowed! Please log in.'}));
+            jsonEncode({'error': 'Not allowed! Please log in.'}),
+            headers: {
+              HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+            },
+          );
         }
       }
 
@@ -251,7 +256,11 @@ Middleware checkAuth() {
           jwtAuth.subject == null ||
           jwtAuth.subject.isEmpty) {
         return Response.forbidden(
-            jsonEncode({'error': 'Not allowed! Please log in.'}));
+          jsonEncode({'error': 'Not allowed! Please log in.'}),
+          headers: {
+            HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+          },
+        );
       }
       // Continue down the pipeline
       return null;

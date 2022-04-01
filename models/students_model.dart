@@ -37,9 +37,13 @@ Future<Response> getAllStudents() async {
   } catch (e) {
     print(e);
     return Response.internalServerError(
-        body: jsonEncode({
-      'error': 'Something went wrong on our end. Please try again later.'
-    }));
+      body: jsonEncode({
+        'error': 'Something went wrong on our end. Please try again later.'
+      }),
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+      },
+    );
   } finally {
     dbConnection.close();
   }
@@ -73,9 +77,13 @@ Future<Response> getStudent(String username) async {
   } catch (e) {
     print(e);
     return Response.internalServerError(
-        body: jsonEncode({
-      'error': 'Something went wrong on our end. Please try again later.'
-    }));
+      body: jsonEncode({
+        'error': 'Something went wrong on our end. Please try again later.'
+      }),
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+      },
+    );
   } finally {
     dbConnection.close();
   }
@@ -90,11 +98,16 @@ Future<Response> borrowBook(int account_id, String uuid) async {
   }
   // Check if book is already borrowed
   if (await isAlreadyBorrowed(uuid)) {
-    return Response(HttpStatus.conflict,
-        body: jsonEncode({'error': 'Not available! Book already borrowed.'}));
+    return Response(
+      HttpStatus.conflict,
+      body: jsonEncode({'error': 'Not available! Book already borrowed.'}),
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+      },
+    );
   }
   try {
-    Results result = await dbConnection.query(
+    await dbConnection.query(
         'UPDATE book ' +
             'SET borrower_id = ?, borrowed_on = now() ' +
             'WHERE book_id = ?  ',
@@ -109,14 +122,22 @@ Future<Response> borrowBook(int account_id, String uuid) async {
     print(e);
     if (e is TimeoutException || e is SocketException) {
       return Response.internalServerError(
-          body: jsonEncode(
-              {'error': 'Connection failed. Please try again later.'}));
+        body:
+            jsonEncode({'error': 'Connection failed. Please try again later.'}),
+        headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+        },
+      );
     }
     // Catch-all other exceptions
     return Response.internalServerError(
-        body: jsonEncode({
-      'error': 'Something went wrong on our end. Please try again later.'
-    }));
+      body: jsonEncode({
+        'error': 'Something went wrong on our end. Please try again later.'
+      }),
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+      },
+    );
   } finally {
     dbConnection.close();
   }

@@ -49,6 +49,9 @@ class AccountsController {
             HttpStatus.badRequest,
             body:
                 jsonEncode({"error": "Please enter a username and password."}),
+            headers: {
+              HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+            },
           );
         }
         return accountsModel.loginAccount(username, password);

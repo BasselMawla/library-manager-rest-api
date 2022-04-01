@@ -1,6 +1,7 @@
 // routes/students_controller.dart
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
@@ -18,7 +19,11 @@ class StudentsController {
       // Check that a librarian is logged in
       if (!await isLibrarian(request)) {
         return Response.forbidden(
-            jsonEncode({'error': 'Not allowed! Must be a librarian.'}));
+          jsonEncode({'error': 'Not allowed! Must be a librarian.'}),
+          headers: {
+            HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+          },
+        );
       }
 
       return await StudentsModel.getAllStudents();
@@ -44,7 +49,11 @@ class StudentsController {
       // Check if librarian
       if (!await isLibrarian(request)) {
         return Response.forbidden(
-            jsonEncode({'error': 'Not allowed! Must be a librarian.'}));
+          jsonEncode({'error': 'Not allowed! Must be a librarian.'}),
+          headers: {
+            HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+          },
+        );
       }
 
       // Retrieve book UUID to add from JSON
@@ -54,14 +63,25 @@ class StudentsController {
 
         // Check that UUID exists
         if (isMissingInput([bookInfo['uuid']])) {
-          return Response(400,
-              body: jsonEncode({'error': 'Please enter book UUID.'}));
+          return Response(
+            400,
+            body: jsonEncode({'error': 'Please enter book UUID.'}),
+            headers: {
+              HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+            },
+          );
         }
         return StudentsModel.borrowBook(
             await getIdFromUsername(username), bookInfo['uuid']);
       } on FormatException catch (e) {
         print(e);
-        return Response(400, body: jsonEncode({'error': 'Invalid JSON!'}));
+        return Response(
+          400,
+          body: jsonEncode({'error': 'Invalid JSON!'}),
+          headers: {
+            HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+          },
+        );
       }
     });
 

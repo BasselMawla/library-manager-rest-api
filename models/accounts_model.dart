@@ -33,23 +33,41 @@ Future<Response> addAccount(Map<String, dynamic> accountInfo) async {
     print(e);
     // Duplicate entry error
     if (e.errorNumber == 1062) {
-      return Response(HttpStatus.conflict,
-          body: jsonEncode({'error': 'Username already exists!'}));
+      return Response(
+        HttpStatus.conflict,
+        body: jsonEncode({'error': 'Username already exists!'}),
+        headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+        },
+      );
     }
     // Other MySqlException errors
-    return Response.internalServerError(body: jsonEncode({'error': e.message}));
+    return Response.internalServerError(
+      body: jsonEncode({'error': e.message}),
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+      },
+    );
   } catch (e) {
     print(e);
     if (e is TimeoutException || e is SocketException) {
       return Response.internalServerError(
-          body: jsonEncode(
-              {'error': 'Connection failed. Please try again later.'}));
+        body:
+            jsonEncode({'error': 'Connection failed. Please try again later.'}),
+        headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+        },
+      );
     }
     // Catch-all other exceptions
     return Response.internalServerError(
-        body: jsonEncode({
-      'error': 'Something went wrong on our end. Please try again later.'
-    }));
+      body: jsonEncode({
+        'error': 'Something went wrong on our end. Please try again later.'
+      }),
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+      },
+    );
   } finally {
     dbConnection.close();
   }
@@ -74,7 +92,11 @@ Future<Response> loginAccount(String username, String password) async {
 
     if (hashedPassword != account['password']) {
       return Response.forbidden(
-          jsonEncode({'error': 'Wrong username or password.'}));
+        jsonEncode({'error': 'Wrong username or password.'}),
+        headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+        },
+      );
     }
 
     // Generate JWT to return with response
@@ -89,14 +111,22 @@ Future<Response> loginAccount(String username, String password) async {
     print(e);
     if (e is TimeoutException || e is SocketException) {
       return Response.internalServerError(
-          body: jsonEncode(
-              {'error': 'Connection failed. Please try again later.'}));
+        body:
+            jsonEncode({'error': 'Connection failed. Please try again later.'}),
+        headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+        },
+      );
     }
     // Catch-all other exceptions
     return Response.internalServerError(
-        body: jsonEncode({
-      'error': 'Something went wrong on our end. Please try again later.'
-    }));
+      body: jsonEncode({
+        'error': 'Something went wrong on our end. Please try again later.'
+      }),
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+      },
+    );
   } finally {
     dbConnection.close();
   }
