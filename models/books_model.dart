@@ -95,7 +95,8 @@ Future<Response> getBookStockList() async {
 
 Future<Response> returnBook(String uuid) async {
   if (!await isAlreadyBorrowed(uuid)) {
-    return Response(HttpStatus.conflict, body: "Book is not borrowed!");
+    return Response(HttpStatus.conflict,
+        body: jsonEncode({'error': 'Book is not borrowed!'}));
   }
 
   MySqlConnection dbConnection = await database.createConnection();
@@ -106,7 +107,7 @@ Future<Response> returnBook(String uuid) async {
             'WHERE book_id = ?  ',
         [uuid]);
 
-    return Response(HttpStatus.noContent, body: 'Book returned.');
+    return Response(HttpStatus.noContent);
   } on MySqlException catch (e) {
     print(e);
     // Other MySqlException errors
