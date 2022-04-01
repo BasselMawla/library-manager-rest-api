@@ -85,7 +85,11 @@ Future<Response> loginAccount(String username, String password) async {
     Iterator iterator = results.iterator;
     if (!iterator.moveNext()) {
       return Response.notFound(
-          jsonEncode({'error': 'Username does not exist.'}));
+        jsonEncode({'error': 'Username does not exist.'}),
+        headers: {
+          HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+        },
+      );
     }
     // Username found. Compare password.
     final account = iterator.current;
