@@ -10,11 +10,6 @@ import '../database_connection.dart' as database;
 import 'utils.dart';
 
 Future<Response> addAccount(Map<String, dynamic> accountInfo) async {
-  if (!isValidCredentials(accountInfo)) {
-    // Guard statement, return error/fail
-    // TODO Validate with regex
-  }
-
   MySqlConnection dbConnection = await database.createConnection();
 
   final String salt = generateSalt();
@@ -22,7 +17,7 @@ Future<Response> addAccount(Map<String, dynamic> accountInfo) async {
 
   // Add the account, if not unique an error is returned which we can catch
   try {
-    Results result = await dbConnection.query(
+    await dbConnection.query(
         'INSERT INTO account (username, first_name, last_name, password, salt) ' +
             'VALUE (?, ?, ?, ?, ?)',
         [
@@ -33,36 +28,34 @@ Future<Response> addAccount(Map<String, dynamic> accountInfo) async {
           salt,
         ]);
 
-    print('User inserted. Affected rows: ${result.affectedRows}');
-    return Response(HttpStatus.created, body: 'Account registered.');
+    return Response(HttpStatus.created);
   } on MySqlException catch (e) {
     print(e);
     // Duplicate entry error
     if (e.errorNumber == 1062) {
-      return Response(HttpStatus.conflict, body: 'Username already exists!');
+      return Response(HttpStatus.conflict,
+          body: jsonEncode({'error': 'Username already exists!'}));
     }
     // Other MySqlException errors
-    return Response.internalServerError(body: e.message);
+    return Response.internalServerError(body: jsonEncode({'error': e.message}));
   } catch (e) {
     print(e);
     if (e is TimeoutException || e is SocketException) {
       return Response.internalServerError(
-          body: 'Connection failed. Please try again later.');
+          body: jsonEncode(
+              {'error': 'Connection failed. Please try again later.'}));
     }
     // Catch-all other exceptions
     return Response.internalServerError(
-        body: 'Something went wrong on our end. Please try again later.');
+        body: jsonEncode({
+      'error': 'Something went wrong on our end. Please try again later.'
+    }));
   } finally {
     dbConnection.close();
   }
 }
 
 Future<Response> loginAccount(String username, String password) async {
-  //if (!isValidCredentials(accountInfo)) {
-  // Guard statement, return error/fail
-  // TODO Validate with regex
-  //}
-
   MySqlConnection dbConnection = await database.createConnection();
 
   // Get the account if it exists
@@ -80,7 +73,8 @@ Future<Response> loginAccount(String username, String password) async {
     final hashedPassword = hashPassword(password, account['salt']);
 
     if (hashedPassword != account['password']) {
-      return Response.forbidden("Wrong username or password.");
+      return Response.forbidden(
+          jsonEncode({'error': 'Wrong username or password.'}));
     }
 
     // Generate JWT to return with response
@@ -91,25 +85,19 @@ Future<Response> loginAccount(String username, String password) async {
         headers: {
           HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
         });
-
-    //} on MySqlException catch (e) {
-    //print(e);
-    //return Response.internalServerError(body: e.message);
   } catch (e) {
     print(e);
     if (e is TimeoutException || e is SocketException) {
       return Response.internalServerError(
-          body: 'Connection failed. Please try again later.');
+          body: jsonEncode(
+              {'error': 'Connection failed. Please try again later.'}));
     }
     // Catch-all other exceptions
     return Response.internalServerError(
-        body: 'Something went wrong on our end. Please try again later.');
+        body: jsonEncode({
+      'error': 'Something went wrong on our end. Please try again later.'
+    }));
   } finally {
     dbConnection.close();
   }
-}
-
-bool isValidCredentials(Map<String, dynamic> userInfo) {
-  // TODO
-  return true;
 }
