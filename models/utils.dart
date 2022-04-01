@@ -139,6 +139,30 @@ Future<bool> isAlreadyBorrowed(String uuid) async {
   }
 }
 
+Future<bool> bookExists(String uuid) async {
+  MySqlConnection dbConnection = await database.createConnection();
+
+  try {
+    Results results = await dbConnection
+        .query('SELECT book_id FROM book WHERE book_id = ?', [uuid]);
+
+    Iterator iterator = results.iterator;
+    // If book not found
+    if (!iterator.moveNext()) {
+      return false;
+    }
+    if (iterator.current['book_id'] != null) {
+      return true;
+    }
+    return false;
+  } catch (e) {
+    print(e);
+    return false;
+  } finally {
+    dbConnection.close();
+  }
+}
+
 String getDueDate(DateTime borrowedOn, int loan_days) {
   final dueDate = borrowedOn.add(Duration(days: loan_days));
   final formattedDate = DateFormat('yyyy-MM-dd').format(dueDate);

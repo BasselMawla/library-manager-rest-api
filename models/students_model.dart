@@ -72,7 +72,6 @@ Future<Response> getStudent(String username) async {
       HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
     });
   } catch (e) {
-    // TODO: Handle more errors
     print(e);
     return Response.internalServerError(
         body: jsonEncode({
@@ -84,8 +83,12 @@ Future<Response> getStudent(String username) async {
 }
 
 Future<Response> borrowBook(int account_id, String uuid) async {
-  // TODO: Check that book exists
   MySqlConnection dbConnection = await database.createConnection();
+  //Check that book exists
+  if (!await bookExists(uuid)) {
+    return Response(HttpStatus.conflict,
+        body: jsonEncode({'error': 'Book does not exist!'}));
+  }
   // Check if book is already borrowed
   if (await isAlreadyBorrowed(uuid)) {
     return Response(HttpStatus.conflict,
@@ -97,8 +100,6 @@ Future<Response> borrowBook(int account_id, String uuid) async {
             'SET borrower_id = ?, borrowed_on = now() ' +
             'WHERE book_id = ?  ',
         [account_id, uuid]);
-
-    print('Book borrowed. Affected rows: ${result.affectedRows}');
 
     return Response(HttpStatus.noContent);
   } on MySqlException catch (e) {
