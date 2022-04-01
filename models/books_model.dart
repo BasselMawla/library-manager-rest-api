@@ -78,13 +78,11 @@ Future<Response> returnBook(String uuid) async {
 
   MySqlConnection dbConnection = await database.createConnection();
   try {
-    Results result = await dbConnection.query(
+    await dbConnection.query(
         'UPDATE book ' +
             'SET borrower_id = null, borrowed_on = null ' +
             'WHERE book_id = ?  ',
         [uuid]);
-
-    print('Book Returned. Affected rows: ${result.affectedRows}');
 
     return Response(HttpStatus.noContent, body: 'Book returned.');
   } on MySqlException catch (e) {
@@ -95,11 +93,13 @@ Future<Response> returnBook(String uuid) async {
     print(e);
     if (e is TimeoutException || e is SocketException) {
       return Response.internalServerError(
-          body: 'Connection failed. Please try again later.');
+          body: jsonEncode(
+              {'error': 'Connection failed. Please try again later.'}));
     }
     // Catch-all other exceptions
     return Response.internalServerError(
-        body: 'Something went wrong on our end. Please try again later.');
+        body: jsonEncode(
+            {'error': 'Something went wrong. Please try again later.'}));
   } finally {
     dbConnection.close();
   }
