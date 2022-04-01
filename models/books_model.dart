@@ -27,7 +27,7 @@ Future<Response> addBook(Map<String, dynamic> book, String librarianId) async {
           ]);
     }
 
-    return Response(HttpStatus.noContent);
+    return Response(HttpStatus.created);
   } catch (e) {
     print(e);
     if (e is TimeoutException || e is SocketException) {
