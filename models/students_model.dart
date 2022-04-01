@@ -35,7 +35,6 @@ Future<Response> getAllStudents() async {
       HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
     });
   } catch (e) {
-    // TODO: Handle more errors
     print(e);
     return Response.internalServerError(
         body: jsonEncode({
