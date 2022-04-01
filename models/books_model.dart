@@ -58,7 +58,7 @@ Future<Response> getBookStockList() async {
 
   try {
     Results results = await dbConnection.query(
-        'SELECT title, author, COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available ' +
+        'SELECT book_id, title, author, COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available ' +
             'FROM book ' +
             'GROUP BY isbn ' +
             'ORDER BY isbn ' +
@@ -66,7 +66,10 @@ Future<Response> getBookStockList() async {
 
     List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
-      resultsList.add(row.fields);
+      Map book = row.fields;
+      book['url'] =
+          'https://mobile-library-api.herokuapp.com/books/${row['book_id']}';
+      resultsList.add(book);
     }
 
     Map books = Map<String, dynamic>();
@@ -145,7 +148,10 @@ Future<Response> searchBooks(String searchQuery) async {
 
     List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
-      resultsList.add(row.fields);
+      Map book = row.fields;
+      book['url'] =
+          'https://mobile-library-api.herokuapp.com/books/${row['book_id']}';
+      resultsList.add(book);
     }
 
     Map searchResults = Map<String, dynamic>();
@@ -170,7 +176,7 @@ Future<Response> searchBooks(String searchQuery) async {
 }
 
 String buildSearchQuery(List<String> keywords) {
-  final String queryStart = 'SELECT title, author, ' +
+  final String queryStart = 'SELECT book_id, title, author, ' +
       'COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available ' +
       'FROM book WHERE ';
   final String queryEnd = ' GROUP BY isbn ORDER BY author, title';

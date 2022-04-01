@@ -25,7 +25,10 @@ Future<Response> getAllStudents() async {
 
     List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
-      resultsList.add(row.fields);
+      Map student = row.fields;
+      student['url'] =
+          'https://mobile-library-api.herokuapp.com/students/${row['username']}';
+      resultsList.add(student);
     }
 
     Map students = Map<String, dynamic>();
