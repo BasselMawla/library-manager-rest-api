@@ -16,7 +16,7 @@ class RouteHandler {
     router.mount("/", HomeController().router);
     router.mount("/accounts", AccountsController().router);
     router.mount("/books", BooksController().handler);
-    router.mount("/books/<uuid>", BooksController().handler);
+    router.mount("/books/<isbn>", BooksController().handler);
     router.mount("/students", StudentsController().handler);
 
     // All invalid URLs

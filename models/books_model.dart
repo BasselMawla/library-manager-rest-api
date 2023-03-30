@@ -61,7 +61,7 @@ Future<Response> getBookStockList() async {
 
   try {
     Results results = await dbConnection.query(
-        "SELECT book_id, isbn, title, author, COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available " +
+        "SELECT isbn, title, author, COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available " +
             "FROM book " +
             "GROUP BY isbn " +
             "ORDER BY isbn " +
@@ -71,8 +71,7 @@ Future<Response> getBookStockList() async {
     for (var row in results) {
       Map book = row.fields;
 
-      book["url"] = "${env["base_url"]}/books/${book["book_id"]}";
-      book.remove("book_id");
+      book["url"] = "${env["base_url"]}/books/${book["isbn"]}";
 
       resultsList.add(book);
     }
@@ -98,14 +97,14 @@ Future<Response> getBookStockList() async {
   }
 }
 
-Future<Response> getBook(uuid) async {
+Future<Response> getBook(isbn) async {
   MySqlConnection dbConnection = await database.createConnection();
   try {
     Results results = await dbConnection.query(
         "SELECT isbn, title, author, COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available " +
             "FROM book " +
             "WHERE book_id = ? ",
-        [uuid]);
+        [isbn]);
 
     Map book = Map<String, dynamic>();
     for (var row in results) {
@@ -190,8 +189,7 @@ Future<Response> searchBooks(String searchQuery) async {
     for (var row in results) {
       Map book = row.fields;
 
-      book["url"] = "${env["base_url"]}/books/${book["book_id"]}";
-      book.remove("book_id");
+      book["url"] = "${env["base_url"]}/books/${book["isbn"]}";
       resultsList.add(book);
     }
 
@@ -217,7 +215,7 @@ Future<Response> searchBooks(String searchQuery) async {
 }
 
 String buildSearchQuery(List<String> keywords) {
-  final String queryStart = "SELECT book_id, isbn, title, author, " +
+  final String queryStart = "SELECT isbn, title, author, " +
       "COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available " +
       "FROM book WHERE ";
   final String queryEnd = " GROUP BY isbn ORDER BY author, title";

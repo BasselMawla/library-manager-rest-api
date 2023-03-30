@@ -28,8 +28,8 @@ class BooksController {
     });
 
     // Get a specific book and its information
-    router.get("/<uuid>", (Request request, String uuid) async {
-      return await BooksModel.getBook(uuid);
+    router.get("/<isbn>", (Request request, String isbn) async {
+      return await BooksModel.getBook(isbn);
     });
 
     // Add a book
