@@ -9,6 +9,10 @@ dependencies:
   shelf: any
   shelf_router: any
   mysql1: any
-  dotenv: any
+  dotenv: ^4.1.0
   dart_jsonwebtoken: any
   intl: any
+
+dev_dependencies:
+  build_runner: any
+  build_web_compilers: any

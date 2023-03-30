@@ -1,13 +1,13 @@
 // server.dart
 
-import 'package:dotenv/dotenv.dart' show env, load;
+import 'package:dotenv/dotenv.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'models/utils.dart';
 import 'route_handler.dart';
 
 void main() async {
-  load(); // Not needed for Heroku
+  var env = DotEnv(includePlatformEnvironment: true)..load();
 
   final route_handler = const Pipeline()
       .addMiddleware(logRequests())

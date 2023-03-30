@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
-import 'package:dotenv/dotenv.dart' show env;
+import 'package:dotenv/dotenv.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:shelf/shelf.dart';
@@ -171,6 +171,8 @@ String getDueDate(DateTime borrowedOn, int loan_days) {
 }
 
 String generateJwt(String account_id) {
+  var env = DotEnv(includePlatformEnvironment: true)..load();
+
   //String username, bool isLibrarian) {
   final jwt = JWT(
     {},
@@ -181,6 +183,8 @@ String generateJwt(String account_id) {
 }
 
 verifyJwt(String token) {
+  var env = DotEnv(includePlatformEnvironment: true)..load();
+
   try {
     final jwt = JWT.verify(token, SecretKey(env['secret']));
     return jwt;
