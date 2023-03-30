@@ -103,7 +103,7 @@ Future<Response> getBook(isbn) async {
     Results results = await dbConnection.query(
         "SELECT isbn, title, author, COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available " +
             "FROM book " +
-            "WHERE book_id = ? ",
+            "WHERE isbn = ? ",
         [isbn]);
 
     Map book = Map<String, dynamic>();
