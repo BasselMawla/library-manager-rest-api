@@ -4,12 +4,15 @@ import "dart:async";
 import "dart:convert";
 import "dart:io";
 
+import "package:dotenv/dotenv.dart";
 import "package:mysql1/mysql1.dart";
 import "package:shelf/shelf.dart";
 import "../database_connection.dart" as database;
 import "utils.dart";
 
 Future<Response> getAllStudents() async {
+  var env = DotEnv(includePlatformEnvironment: true)..load();
+
   MySqlConnection dbConnection = await database.createConnection();
 
   try {
@@ -26,8 +29,7 @@ Future<Response> getAllStudents() async {
     List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
       Map student = row.fields;
-      student["url"] =
-          "https://mobile-library-api.herokuapp.com/students/${row["username"]}";
+      student["url"] = "${env["base_url"]}/students/${row["username"]}";
       resultsList.add(student);
     }
 

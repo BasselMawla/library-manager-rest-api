@@ -70,8 +70,7 @@ Future<Response> getBookStockList() async {
     List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
       Map book = row.fields;
-      book["url"] =
-          "${env["base_url"]}https://mobile-library-api.herokuapp.com/books/${row["book_id"]}";
+      book["url"] = "${env["base_url"]}/books/${row["book_id"]}";
       resultsList.add(book);
     }
 
@@ -140,6 +139,8 @@ Future<Response> returnBook(String uuid) async {
 }
 
 Future<Response> searchBooks(String searchQuery) async {
+  var env = DotEnv(includePlatformEnvironment: true)..load();
+
   final List keywords = searchQuery.split(" ");
   // Build the query to search for each keyword in title or author
   final String finalQuery = buildSearchQuery(keywords);
@@ -153,8 +154,7 @@ Future<Response> searchBooks(String searchQuery) async {
     List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
       Map book = row.fields;
-      book["url"] =
-          "https://mobile-library-api.herokuapp.com/books/${row["book_id"]}";
+      book["url"] = "${env["base_url"]}/books/${row["book_id"]}";
       resultsList.add(book);
     }
 
