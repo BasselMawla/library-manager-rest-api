@@ -3,7 +3,7 @@
 name: library_api
 
 environment:
-  sdk: '>=2.10.0 <3.0.0'
+  sdk: ">=2.10.0 <3.0.0"
 
 dependencies:
   shelf: any
@@ -11,4 +11,4 @@ dependencies:
   mysql1: any
   dotenv: any
   dart_jsonwebtoken: any
-  intl: ^0.17.0
+  intl: any
