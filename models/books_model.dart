@@ -61,7 +61,7 @@ Future<Response> getBookStockList() async {
 
   try {
     Results results = await dbConnection.query(
-        "SELECT book_id, title, author, COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available " +
+        "SELECT book_id, isbn, title, author, COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available " +
             "FROM book " +
             "GROUP BY isbn " +
             "ORDER BY isbn " +
@@ -70,7 +70,10 @@ Future<Response> getBookStockList() async {
     List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
       Map book = row.fields;
-      book["url"] = "${env["base_url"]}/books/${row["book_id"]}";
+
+      book["url"] = "${env["base_url"]}/books/${book["book_id"]}";
+      book.remove("book_id");
+
       resultsList.add(book);
     }
 
@@ -78,6 +81,40 @@ Future<Response> getBookStockList() async {
     books["books"] = resultsList;
 
     return Response.ok(jsonEncode(books), headers: {
+      HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+    });
+  } catch (e) {
+    print(e);
+    return Response.internalServerError(
+      body: jsonEncode({
+        "error": "Something went wrong on our end. Please try again later."
+      }),
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+      },
+    );
+  } finally {
+    dbConnection.close();
+  }
+}
+
+Future<Response> getBook(uuid) async {
+  var env = DotEnv(includePlatformEnvironment: true)..load();
+
+  MySqlConnection dbConnection = await database.createConnection();
+  try {
+    Results results = await dbConnection.query(
+        "SELECT isbn, title, author, COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available " +
+            "FROM book " +
+            "WHERE book_id = ? ",
+        [uuid]);
+
+    Map book = Map<String, dynamic>();
+    for (var row in results) {
+      book = row.fields;
+    }
+
+    return Response.ok(jsonEncode(book), headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
     });
   } catch (e) {
@@ -154,7 +191,9 @@ Future<Response> searchBooks(String searchQuery) async {
     List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
       Map book = row.fields;
-      book["url"] = "${env["base_url"]}/books/${row["book_id"]}";
+
+      book["url"] = "${env["base_url"]}/books/${book["book_id"]}";
+      book.remove("book_id");
       resultsList.add(book);
     }
 
@@ -180,7 +219,7 @@ Future<Response> searchBooks(String searchQuery) async {
 }
 
 String buildSearchQuery(List<String> keywords) {
-  final String queryStart = "SELECT book_id, title, author, " +
+  final String queryStart = "SELECT book_id, isbn, title, author, " +
       "COUNT(isbn) as stock, (COUNT(isbn) - COUNT(borrower_id)) as available " +
       "FROM book WHERE ";
   final String queryEnd = " GROUP BY isbn ORDER BY author, title";

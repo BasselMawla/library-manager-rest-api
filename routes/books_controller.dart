@@ -18,14 +18,18 @@ class BooksController {
     // Get all books and their stock or search for a book
     router.get("/", (Request request) async {
       // First check if this is a search request
-      String searchQuery = request.url.queryParameters["q"];
-      if (searchQuery != null && !searchQuery.isEmpty) {
+      if (request.url.queryParameters.containsKey('q')) {
         // Search query found
-        return BooksModel.searchBooks(searchQuery);
+        return BooksModel.searchBooks(request.url.queryParameters["q"]);
       }
 
       // Not a search query, retrieve all books and their stocks
       return await BooksModel.getBookStockList();
+    });
+
+    // Get a specific book and its information
+    router.get("/<uuid>", (Request request, String uuid) async {
+      return await BooksModel.getBook(uuid);
     });
 
     // Add a book
