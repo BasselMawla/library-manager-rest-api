@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dotenv/dotenv.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:shelf/shelf.dart';
 import '../database_connection.dart' as database;
@@ -54,6 +55,8 @@ Future<Response> addBook(Map<String, dynamic> book, String librarianId) async {
 }
 
 Future<Response> getBookStockList() async {
+  var env = DotEnv(includePlatformEnvironment: true)..load();
+
   MySqlConnection dbConnection = await database.createConnection();
 
   try {
@@ -68,7 +71,7 @@ Future<Response> getBookStockList() async {
     for (var row in results) {
       Map book = row.fields;
       book['url'] =
-          'https://mobile-library-api.herokuapp.com/books/${row['book_id']}';
+          "${env["base_url"]}https://mobile-library-api.herokuapp.com/books/${row['book_id']}";
       resultsList.add(book);
     }
 
