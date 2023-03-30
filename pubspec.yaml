@@ -12,6 +12,7 @@ dependencies:
   dotenv: ^4.1.0
   dart_jsonwebtoken: any
   intl: any
+  webdev: ^2.7.12
 
 dev_dependencies:
   build_runner: any
