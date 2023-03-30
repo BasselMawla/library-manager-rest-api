@@ -99,8 +99,6 @@ Future<Response> getBookStockList() async {
 }
 
 Future<Response> getBook(uuid) async {
-  var env = DotEnv(includePlatformEnvironment: true)..load();
-
   MySqlConnection dbConnection = await database.createConnection();
   try {
     Results results = await dbConnection.query(
