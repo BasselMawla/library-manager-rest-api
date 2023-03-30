@@ -1,13 +1,13 @@
 // models/students_model.dart
 
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
+import "dart:async";
+import "dart:convert";
+import "dart:io";
 
-import 'package:mysql1/mysql1.dart';
-import 'package:shelf/shelf.dart';
-import '../database_connection.dart' as database;
-import 'utils.dart';
+import "package:mysql1/mysql1.dart";
+import "package:shelf/shelf.dart";
+import "../database_connection.dart" as database;
+import "utils.dart";
 
 Future<Response> getAllStudents() async {
   MySqlConnection dbConnection = await database.createConnection();
@@ -15,24 +15,24 @@ Future<Response> getAllStudents() async {
   try {
     // Retrieve students and their borrowing records
     Results results = await dbConnection.query(
-        'SELECT username, first_name, last_name, COUNT(borrower_id) as "borrowing_count" ' +
-            'FROM account ' +
-            'LEFT JOIN book ' +
-            'ON account_id = borrower_id ' +
-            'WHERE is_librarian = 0 ' +
-            'GROUP BY account_id ' +
-            'LIMIT 25');
+        "SELECT username, first_name, last_name, COUNT(borrower_id) as 'borrowing_count' " +
+            "FROM account " +
+            "LEFT JOIN book " +
+            "ON account_id = borrower_id " +
+            "WHERE is_librarian = 0 " +
+            "GROUP BY account_id " +
+            "LIMIT 25");
 
     List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
       Map student = row.fields;
-      student['url'] =
-          'https://mobile-library-api.herokuapp.com/students/${row['username']}';
+      student["url"] =
+          "https://mobile-library-api.herokuapp.com/students/${row["username"]}";
       resultsList.add(student);
     }
 
     Map students = Map<String, dynamic>();
-    students['students'] = resultsList;
+    students["students"] = resultsList;
 
     return Response.ok(jsonEncode(students), headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
@@ -41,7 +41,7 @@ Future<Response> getAllStudents() async {
     print(e);
     return Response.internalServerError(
       body: jsonEncode({
-        'error': 'Something went wrong on our end. Please try again later.'
+        "error": "Something went wrong on our end. Please try again later."
       }),
       headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
@@ -57,22 +57,22 @@ Future<Response> getStudent(String username) async {
 
   try {
     Results results = await dbConnection.query(
-        'SELECT book_id, title as title, borrowed_on, loan_days ' +
-            'FROM account, book ' +
-            'WHERE username = ? AND account_id = borrower_id ' +
-            'LIMIT 25',
+        "SELECT book_id, title as title, borrowed_on, loan_days " +
+            "FROM account, book " +
+            "WHERE username = ? AND account_id = borrower_id " +
+            "LIMIT 25",
         [username]);
 
     List<Map> resultsList = <Map<String, dynamic>>[];
     for (var row in results) {
-      row.fields['due_date'] =
-          getDueDate(row.fields['borrowed_on'], row.fields['loan_days']);
-      row.fields.remove('borrowed_on');
+      row.fields["due_date"] =
+          getDueDate(row.fields["borrowed_on"], row.fields["loan_days"]);
+      row.fields.remove("borrowed_on");
       resultsList.add(row.fields);
     }
 
     Map borrowingRecord = Map<String, dynamic>();
-    borrowingRecord['borrowed_books'] = resultsList;
+    borrowingRecord["borrowed_books"] = resultsList;
 
     return Response.ok(jsonEncode(borrowingRecord), headers: {
       HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
@@ -81,7 +81,7 @@ Future<Response> getStudent(String username) async {
     print(e);
     return Response.internalServerError(
       body: jsonEncode({
-        'error': 'Something went wrong on our end. Please try again later.'
+        "error": "Something went wrong on our end. Please try again later."
       }),
       headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
@@ -97,13 +97,13 @@ Future<Response> borrowBook(int account_id, String uuid) async {
   //Check that book exists
   if (!await bookExists(uuid)) {
     return Response(HttpStatus.conflict,
-        body: jsonEncode({'error': 'Book does not exist!'}));
+        body: jsonEncode({"error": "Book does not exist!"}));
   }
   // Check if book is already borrowed
   if (await isAlreadyBorrowed(uuid)) {
     return Response(
       HttpStatus.conflict,
-      body: jsonEncode({'error': 'Not available! Book already borrowed.'}),
+      body: jsonEncode({"error": "Not available! Book already borrowed."}),
       headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
       },
@@ -111,9 +111,9 @@ Future<Response> borrowBook(int account_id, String uuid) async {
   }
   try {
     await dbConnection.query(
-        'UPDATE book ' +
-            'SET borrower_id = ?, borrowed_on = now() ' +
-            'WHERE book_id = ?  ',
+        "UPDATE book " +
+            "SET borrower_id = ?, borrowed_on = now() " +
+            "WHERE book_id = ?  ",
         [account_id, uuid]);
 
     return Response(HttpStatus.noContent);
@@ -126,7 +126,7 @@ Future<Response> borrowBook(int account_id, String uuid) async {
     if (e is TimeoutException || e is SocketException) {
       return Response.internalServerError(
         body:
-            jsonEncode({'error': 'Connection failed. Please try again later.'}),
+            jsonEncode({"error": "Connection failed. Please try again later."}),
         headers: {
           HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
         },
@@ -135,7 +135,7 @@ Future<Response> borrowBook(int account_id, String uuid) async {
     // Catch-all other exceptions
     return Response.internalServerError(
       body: jsonEncode({
-        'error': 'Something went wrong on our end. Please try again later.'
+        "error": "Something went wrong on our end. Please try again later."
       }),
       headers: {
         HttpHeaders.contentTypeHeader: ContentType.json.mimeType,

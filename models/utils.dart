@@ -1,15 +1,15 @@
 // models/utils.dart
 
-import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
-import 'package:crypto/crypto.dart';
-import 'package:dotenv/dotenv.dart';
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'package:mysql1/mysql1.dart';
-import 'package:shelf/shelf.dart';
-import '../database_connection.dart' as database;
-import 'package:intl/intl.dart' show DateFormat;
+import "dart:convert";
+import "dart:io";
+import "dart:math";
+import "package:crypto/crypto.dart";
+import "package:dotenv/dotenv.dart";
+import "package:dart_jsonwebtoken/dart_jsonwebtoken.dart";
+import "package:mysql1/mysql1.dart";
+import "package:shelf/shelf.dart";
+import "../database_connection.dart" as database;
+import "package:intl/intl.dart" show DateFormat;
 
 String generateSalt() {
   final random = Random.secure();
@@ -40,7 +40,7 @@ bool isMissingInput(List<String> keys) {
 }
 
 String getIdFromJwt(Request request) {
-  final jwtAuth = request.context['jwtAuth'] as JWT;
+  final jwtAuth = request.context["jwtAuth"] as JWT;
   return jwtAuth.subject;
 }
 
@@ -54,7 +54,7 @@ Future<bool> isLibrarian(Request request) async {
 
   try {
     Results results = await dbConnection.query(
-        'SELECT is_librarian FROM account WHERE account_id = ?', [accountId]);
+        "SELECT is_librarian FROM account WHERE account_id = ?", [accountId]);
 
     Iterator iterator = results.iterator;
     // If account not found
@@ -62,7 +62,7 @@ Future<bool> isLibrarian(Request request) async {
       return false;
     }
     // If is_librarian is true
-    if (iterator.current['is_librarian'] == 1) {
+    if (iterator.current["is_librarian"] == 1) {
       return true;
     }
     return false;
@@ -79,14 +79,14 @@ Future<String> getUsernameFromId(String account_id) async {
 
   try {
     Results results = await dbConnection.query(
-        'SELECT username FROM account WHERE account_id = ?', [account_id]);
+        "SELECT username FROM account WHERE account_id = ?", [account_id]);
 
     Iterator iterator = results.iterator;
     // If account not found
     if (!iterator.moveNext()) {
       return null;
     }
-    return iterator.current['username'];
+    return iterator.current["username"];
   } catch (e) {
     print(e);
     return null;
@@ -100,14 +100,14 @@ Future<int> getIdFromUsername(String username) async {
 
   try {
     Results results = await dbConnection
-        .query('SELECT account_id FROM account WHERE username = ?', [username]);
+        .query("SELECT account_id FROM account WHERE username = ?", [username]);
 
     Iterator iterator = results.iterator;
     // If account not found
     if (!iterator.moveNext()) {
       return null;
     }
-    return iterator.current['account_id'];
+    return iterator.current["account_id"];
   } catch (e) {
     print(e);
     return null;
@@ -121,14 +121,14 @@ Future<bool> isAlreadyBorrowed(String uuid) async {
 
   try {
     Results results = await dbConnection
-        .query('SELECT borrower_id FROM book WHERE book_id = ?', [uuid]);
+        .query("SELECT borrower_id FROM book WHERE book_id = ?", [uuid]);
 
     Iterator iterator = results.iterator;
     // If book not found
     if (!iterator.moveNext()) {
       return false;
     }
-    if (iterator.current['borrower_id'] != null) {
+    if (iterator.current["borrower_id"] != null) {
       return true;
     }
     return false;
@@ -145,14 +145,14 @@ Future<bool> bookExists(String uuid) async {
 
   try {
     Results results = await dbConnection
-        .query('SELECT book_id FROM book WHERE book_id = ?', [uuid]);
+        .query("SELECT book_id FROM book WHERE book_id = ?", [uuid]);
 
     Iterator iterator = results.iterator;
     // If book not found
     if (!iterator.moveNext()) {
       return false;
     }
-    if (iterator.current['book_id'] != null) {
+    if (iterator.current["book_id"] != null) {
       return true;
     }
     return false;
@@ -166,7 +166,7 @@ Future<bool> bookExists(String uuid) async {
 
 String getDueDate(DateTime borrowedOn, int loan_days) {
   final dueDate = borrowedOn.add(Duration(days: loan_days));
-  final formattedDate = DateFormat('yyyy-MM-dd').format(dueDate);
+  final formattedDate = DateFormat("yyyy-MM-dd").format(dueDate);
   return formattedDate.toString();
 }
 
@@ -177,19 +177,19 @@ String generateJwt(String account_id) {
   final jwt = JWT(
     {},
     subject: account_id,
-    issuer: env['issuer'],
+    issuer: env["issuer"],
   );
-  return jwt.sign(SecretKey(env['secret']));
+  return jwt.sign(SecretKey(env["secret"]));
 }
 
 verifyJwt(String token) {
   var env = DotEnv(includePlatformEnvironment: true)..load();
 
   try {
-    final jwt = JWT.verify(token, SecretKey(env['secret']));
+    final jwt = JWT.verify(token, SecretKey(env["secret"]));
     return jwt;
   } on JWTExpiredError {
-    print('jwt expired');
+    print("jwt expired");
     return null;
   } on JWTError catch (e) {
     print(e.message); // e: invalid signature
@@ -199,15 +199,15 @@ verifyJwt(String token) {
 
 Middleware handleCors() {
   const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST',
-    'Access-Control-Allow-Headers':
-        'Origin, Content-Type, Authorization, username, password',
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST",
+    "Access-Control-Allow-Headers":
+        "Origin, Content-Type, Authorization, username, password",
   };
 
   return createMiddleware(requestHandler: (Request request) {
-    if (request.method == 'OPTIONS') {
-      return Response.ok('', headers: corsHeaders);
+    if (request.method == "OPTIONS") {
+      return Response.ok("", headers: corsHeaders);
     }
     // Continue request
     return null;
@@ -219,16 +219,16 @@ Middleware handleCors() {
 Middleware handleAuth() {
   return (Handler handler) {
     return (Request request) async {
-      final authHeader = request.headers['authorization'];
+      final authHeader = request.headers["authorization"];
       var jwt;
 
-      if (authHeader != null && authHeader.startsWith('Bearer ')) {
+      if (authHeader != null && authHeader.startsWith("Bearer ")) {
         String token =
-            authHeader.substring(7); // Token is whatever is after 'Bearer '
+            authHeader.substring(7); // Token is whatever is after "Bearer "
         jwt = verifyJwt(token);
         if (jwt == null) {
           return Response.forbidden(
-            jsonEncode({'error': 'Not allowed! Please log in.'}),
+            jsonEncode({"error": "Not allowed! Please log in."}),
             headers: {
               HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
             },
@@ -237,7 +237,7 @@ Middleware handleAuth() {
       }
 
       final updatedRequest = request.change(context: {
-        'jwtAuth': jwt,
+        "jwtAuth": jwt,
       });
       // Continue with updated request
       return await handler(updatedRequest);
@@ -249,18 +249,18 @@ Middleware checkAuth() {
   return createMiddleware(
     requestHandler: (Request request) {
       bool isBooksRequest =
-          (request.handlerPath == '/books' || request.handlerPath == '/books/');
+          (request.handlerPath == "/books" || request.handlerPath == "/books/");
 
       // If only getting books, no need to auth
-      if (isBooksRequest && request.method == 'GET') {
+      if (isBooksRequest && request.method == "GET") {
         return null;
       }
-      final jwtAuth = request.context['jwtAuth'] as JWT;
+      final jwtAuth = request.context["jwtAuth"] as JWT;
       if (jwtAuth == null ||
           jwtAuth.subject == null ||
           jwtAuth.subject.isEmpty) {
         return Response.forbidden(
-          jsonEncode({'error': 'Not allowed! Please log in.'}),
+          jsonEncode({"error": "Not allowed! Please log in."}),
           headers: {
             HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
           },
